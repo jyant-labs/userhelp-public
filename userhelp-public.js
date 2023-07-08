@@ -65,10 +65,12 @@ var yourCodeToBeCalled = function(){
     function handleClick() {
         // Add your custom logic here when the button is clicked.
         // For example, you can redirect to another page or modify the content of the website.
-        html2canvas(document.body).then(function(canvas) {
+        html2canvas(document.body, {
+            allowTaint : true,
+        }).then(function(canvas) {
             // Convert the canvas to an image URL
             var screenshotUrl = canvas.toDataURL();
-            const iframe = document.querySelector("iframe");
+            const iframe = document.getElementById("UserHelpIframe");
             iframe.contentWindow.postMessage(screenshotUrl, "*");
         });
     }
@@ -78,7 +80,7 @@ var yourCodeToBeCalled = function(){
     userHelpButton.addEventListener("click", handleClick);
 
     // Append the button to the body of the website
-    const placement = document.getElementById("#UserHelpManualContainerID")
+    const placement = document.getElementById("UserHelpManualContainerID")
     if(placement) {
         placement.appendChild(userHelpButton)
         console.log("cant find placement")
@@ -279,7 +281,7 @@ document.write(`
 <div class="drawer__wrapper">
     <div class="drawer__header">
     <div style="font-family: sans-serif;font-weight: bold;">
-        Header Title
+        ${UserHelpButtonText}
     </div>
     <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
     </div>
