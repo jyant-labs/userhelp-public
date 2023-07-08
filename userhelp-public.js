@@ -32,6 +32,31 @@ var yourCodeToBeCalled = function(){
     // Set any additional styles if needed
     userHelpButton.style.backgroundColor = UserHelpButtonColor
     userHelpButton.style.color = UserHelpTextColor
+
+    if(UserHelpPlacementMode == "automatic") {
+        switch (UserHelpAutomaticPosition) {
+            case "bottomRight":
+                userHelpButton.classList.add("userHelpButtonBottomRight")
+                break;
+            
+            case "bottomLeft":
+                userHelpButton.classList.add("userHelpButtonBottomLeft")
+                break;
+
+            case "topRight":
+                userHelpButton.classList.add("userHelpButtonTopRight")
+                break;
+
+            case "topLeft":
+                userHelpButton.classList.add("userHelpButtonTopLeft")
+                break;
+        
+            default:
+                userHelpButton.classList.add("userHelpButtonBottomRight")
+                break;
+        }
+    }
+
     userHelpButton.setAttribute("data-drawer-trigger","true")
     userHelpButton.setAttribute("aria-controls","drawer-name")
     userHelpButton.setAttribute("aria-expanded","false")
@@ -53,7 +78,7 @@ var yourCodeToBeCalled = function(){
     userHelpButton.addEventListener("click", handleClick);
 
     // Append the button to the body of the website
-    const placement = document.getElementById("#reportAProblem")
+    const placement = document.getElementById("#UserHelpManualContainerID")
     if(placement) {
         placement.appendChild(userHelpButton)
         console.log("cant find placement")

@@ -1,9 +1,41 @@
 #userHelpButton {
   padding: 10px;
   font-weight: bold;
+  font-size: 1em;
   cursor: pointer;
   border-radius: 5px;
   border:none
+}
+
+.userHelpButtonBottomRight {
+  position: fixed;
+  bottom:20px;
+  right:20px;
+  z-index: 199;
+}
+
+.userHelpButtonBottomLeft {
+  position: fixed;
+  bottom: 20px;
+  left:20px;
+  z-index: 199;
+
+}
+
+.userHelpButtonTopRight {
+  position: fixed;
+  top: 20px;
+  right:20px;
+  z-index: 199;
+
+}
+
+.userHelpButtonTopLeft {
+  position: fixed;
+  top: 20px;
+  left:20px;
+  z-index: 199;
+
 }
 
 .drawer {
