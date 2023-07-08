@@ -67,6 +67,7 @@ var yourCodeToBeCalled = function(){
         // For example, you can redirect to another page or modify the content of the website.
         html2canvas(document.body, {
             allowTaint : true,
+            useCors : true
         }).then(function(canvas) {
             // Convert the canvas to an image URL
             var screenshotUrl = canvas.toDataURL();
