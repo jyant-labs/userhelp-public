@@ -326,7 +326,7 @@ document.write(`
     <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
     </div>
     <div class="drawer__content">
-    <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://userhelp.co/template/${UserHelpPublicProjectID}/${crypto.randomUUID()}"></iframe>
+    <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://app.userhelp.co/template/${UserHelpPublicProjectID}/${crypto.randomUUID()}"></iframe>
     </div>
 </div>
 </section>`)
