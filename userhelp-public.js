@@ -138,7 +138,7 @@ window.onload = function() {
     if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS") {
         yourCodeToBeCalled()
     } else {
-        loadJS('https://html2canvas.hertzen.com/dist/html2canvas.min.js', yourCodeToBeCalled, document.head);
+        loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', yourCodeToBeCalled, document.head);
     }
 }
 
