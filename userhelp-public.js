@@ -79,34 +79,44 @@ var yourCodeToBeCalled = function(){
     async function captureScreenshot() {
         document.getElementsByClassName("drawer__overlay")[0].click();
         setTimeout(function(){
-            navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
-            .then((stream) => {
-                const videoTrack = stream.getVideoTracks()[0];
-                const imageCapture = new ImageCapture(videoTrack);
+            if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS") {
+                navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
+                .then((stream) => {
+                    const videoTrack = stream.getVideoTracks()[0];
+                    const imageCapture = new ImageCapture(videoTrack);
 
-                imageCapture.grabFrame()
-                .then((imageBitmap) => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = imageBitmap.width;
-                    canvas.height = imageBitmap.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(imageBitmap, 0, 0);
+                    imageCapture.grabFrame()
+                    .then((imageBitmap) => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = imageBitmap.width;
+                        canvas.height = imageBitmap.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(imageBitmap, 0, 0);
+                        const screenshotDataUrl = canvas.toDataURL('image/png');
+                        const iframe = document.getElementById("UserHelpIframe");
+                        iframe.contentWindow.postMessage(screenshotDataUrl, "*");
+                        document.getElementById("userHelpButton").click();
+                        // Do something with the screenshotDataUrl, such as displaying it in an image element or sending it to a server.
+                    })
+                    .catch((error) => {
+                        console.error('Error capturing screenshot:', error);
+                    })
+                    .finally(() => {
+                        videoTrack.stop();
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error accessing screen:', error);
+                });
+            } else {
+                html2canvas(document.body).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png');
                     const iframe = document.getElementById("UserHelpIframe");
                     iframe.contentWindow.postMessage(screenshotDataUrl, "*");
                     document.getElementById("userHelpButton").click();
-                    // Do something with the screenshotDataUrl, such as displaying it in an image element or sending it to a server.
-                })
-                .catch((error) => {
-                    console.error('Error capturing screenshot:', error);
-                })
-                .finally(() => {
-                    videoTrack.stop();
                 });
-            })
-            .catch((error) => {
-                console.error('Error accessing screen:', error);
-            });
+            }
+            
         }, 350);
     }
 
@@ -124,11 +134,32 @@ var yourCodeToBeCalled = function(){
     }
 }
 
-// loadJS('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js', yourCodeToBeCalled, document.head);
-
-
 window.onload = function() {
-    yourCodeToBeCalled()
+    if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS") {
+        yourCodeToBeCalled()
+    } else {
+        loadJS('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js', yourCodeToBeCalled, document.head);
+    }
+}
+
+function getMobileOperatingSystem() {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Windows Phone must come first because its UA also contains "Android"
+    if (/windows phone/i.test(userAgent)) {
+        return "Windows Phone";
+    }
+
+    if (/android/i.test(userAgent)) {
+        return "Android";
+    }
+
+    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return "iOS";
+    }
+
+    return "unknown";
 }
 
 var drawer = function () {
