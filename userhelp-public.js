@@ -65,7 +65,7 @@ var yourCodeToBeCalled = function(){
         var result = bowser.getParser(window.navigator.userAgent);
 
         const iframe = document.getElementById("UserHelpIframe");
-        
+
         iframe.contentWindow.postMessage(`url${window.location.href}`, "*");
         iframe.contentWindow.postMessage(`browser${JSON.stringify(result.parsedResult)}`, "*");
     }
@@ -114,7 +114,11 @@ var yourCodeToBeCalled = function(){
                     console.error('Error accessing screen:', error);
                 });
             } else {
-                html2canvas(document.body).then(function(canvas) {
+                html2canvas(document.body, {
+                    height: window.innerHeight,
+                    y:document.documentElement.scrollTop || document.body.scrollTop,
+                    allowTaint:true
+                }).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png');
                     const iframe = document.getElementById("UserHelpIframe");
                     iframe.contentWindow.postMessage(screenshotDataUrl, "*");
