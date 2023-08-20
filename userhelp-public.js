@@ -188,11 +188,6 @@ var yourCodeToBeCalled = function(){
 
 
 window.onload = function() {
-    document.getElementById("stopBtn").onclick = function() {
-        console.log('done')
-        throw new Error("Damn")
-    }
-
     loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
         loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', initialLoad, document.head);
     }, document.head)
