@@ -20,7 +20,7 @@ var loadJS = function(url, implementationCode, location){
 };
 
 
-var yourCodeToBeCalled = function(){
+var mainFunction = function(){
     // Create the button element
     const userHelpButton = document.createElement("button");
     userHelpButton.id = "userHelpButton"
@@ -77,6 +77,7 @@ var yourCodeToBeCalled = function(){
     });
 
     window.onerror = function (msg, url, lineNo, columnNo, error) {
+        console.log(error)
         const iframe = document.getElementById("UserHelpIframe");
         iframe.contentWindow.postMessage(`error${JSON.stringify({
             msg:msg,
@@ -91,14 +92,17 @@ var yourCodeToBeCalled = function(){
     async function captureScreenshot() {
         document.getElementsByClassName("drawer__overlay")[0].click();
         setTimeout(function(){
-            if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS") {
+            var isFirefox = typeof InstallTrigger !== 'undefined';
+            var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
+            if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
                 navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
                 .then((stream) => {
                     const videoTrack = stream.getVideoTracks()[0];
                     const imageCapture = new ImageCapture(videoTrack);
 
                     imageCapture.grabFrame()
-                    .then((imageBitmap) => {
+                    .then(async(imageBitmap) => {
+
                         const canvas = document.createElement('canvas');
                         canvas.width = imageBitmap.width;
                         canvas.height = imageBitmap.height;
@@ -194,10 +198,12 @@ window.onload = function() {
 }
 
 function initialLoad() {
-    if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS") {
-        yourCodeToBeCalled()
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
+    if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
+        mainFunction()
     } else {
-        loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', yourCodeToBeCalled, document.head);
+        loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
     }
 }
 
