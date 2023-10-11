@@ -89,6 +89,7 @@ var mainFunction = function(){
 
         const len = eventsMatrix.length;
         const events = eventsMatrix[len - 1]
+        console.log(JSON.stringify({events}))
         iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
     }
     
@@ -200,6 +201,16 @@ window.onload = function() {
             loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
         }, document.head);
     }, document.head)
+}
+
+function initialLoad() {
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
+    if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
+        mainFunction()
+    } else {
+        loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
+    }
 
     rrwebRecord({
         emit(event, isCheckout) {
@@ -212,16 +223,6 @@ window.onload = function() {
         },
         checkoutEveryNms: 30 * 1000, // checkout every 30 seconds
     });
-}
-
-function initialLoad() {
-    var isFirefox = typeof InstallTrigger !== 'undefined';
-    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
-    if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
-        mainFunction()
-    } else {
-        loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
-    }
 }
 
 function getMobileOperatingSystem() {
