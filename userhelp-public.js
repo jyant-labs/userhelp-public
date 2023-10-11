@@ -3,6 +3,8 @@ link.href = "https://cdn.jsdelivr.net/gh/jyant-labs/userhelp-public@latest/userh
 link.type = "text/css";
 link.rel = "stylesheet";
 
+var eventsMatrix = [[]];
+
 document.getElementsByTagName( "head" )[0].appendChild( link );
 
 var loadJS = function(url, implementationCode, location){
@@ -18,7 +20,6 @@ var loadJS = function(url, implementationCode, location){
 
     location.appendChild(scriptTag);
 };
-
 
 var mainFunction = function(){
     // Create the button element
@@ -77,7 +78,6 @@ var mainFunction = function(){
     });
 
     window.onerror = function (msg, url, lineNo, columnNo, error) {
-        console.log(error)
         const iframe = document.getElementById("UserHelpIframe");
         iframe.contentWindow.postMessage(`error${JSON.stringify({
             msg:msg,
@@ -86,6 +86,10 @@ var mainFunction = function(){
             columnNo:columnNo,
             error:error
         })}`, "*");
+
+        const len = eventsMatrix.length;
+        const events = eventsMatrix[len - 1]
+        iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
     }
     
 
@@ -190,11 +194,24 @@ var mainFunction = function(){
     }
 }
 
-
 window.onload = function() {
     loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
-        loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', initialLoad, document.head);
+        loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
+            loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
+        }, document.head);
     }, document.head)
+
+    rrwebRecord({
+        emit(event, isCheckout) {
+          // isCheckout is a flag to tell you the events has been checkout
+          if (isCheckout) {
+            eventsMatrix.push([]);
+          }
+          const lastEvents = eventsMatrix[eventsMatrix.length - 1];
+          lastEvents.push(event);
+        },
+        checkoutEveryNms: 30 * 1000, // checkout every 30 seconds
+    });
 }
 
 function initialLoad() {
