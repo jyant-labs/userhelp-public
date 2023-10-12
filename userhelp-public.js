@@ -7,6 +7,26 @@ var eventsMatrix = [[]];
 
 document.getElementsByTagName( "head" )[0].appendChild( link );
 
+function getMobileOperatingSystem() {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Windows Phone must come first because its UA also contains "Android"
+    if (/windows phone/i.test(userAgent)) {
+        return "Windows Phone";
+    }
+
+    if (/android/i.test(userAgent)) {
+        return "Android";
+    }
+
+    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return "iOS";
+    }
+
+    return "unknown";
+}
+
 var loadJS = function(url, implementationCode, location){
     //url is URL of external file, implementationCode is the code
     //to be called from the file, location is the location to 
@@ -22,6 +42,19 @@ var loadJS = function(url, implementationCode, location){
 };
 
 var mainFunction = function(){
+
+    rrwebRecord({
+        emit(event, isCheckout) {
+          // isCheckout is a flag to tell you the events has been checkout
+          if (isCheckout) {
+            eventsMatrix.push([]);
+          }
+          const lastEvents = eventsMatrix[eventsMatrix.length - 1];
+          lastEvents.push(event);
+        },
+        checkoutEveryNms: 30 * 1000, // checkout every 30 seconds
+    });
+
     // Create the button element
     const userHelpButton = document.createElement("button");
     userHelpButton.id = "userHelpButton"
@@ -193,7 +226,6 @@ var mainFunction = function(){
     const placement = document.getElementById("UserHelpManualContainerID")
     if(placement) {
         placement.appendChild(userHelpButton)
-        console.log("cant find placement")
     } else {
         document.body.appendChild(userHelpButton);
     }
@@ -215,38 +247,6 @@ function initialLoad() {
     } else {
         loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
     }
-
-    rrwebRecord({
-        emit(event, isCheckout) {
-          // isCheckout is a flag to tell you the events has been checkout
-          if (isCheckout) {
-            eventsMatrix.push([]);
-          }
-          const lastEvents = eventsMatrix[eventsMatrix.length - 1];
-          lastEvents.push(event);
-        },
-        checkoutEveryNms: 30 * 1000, // checkout every 30 seconds
-    });
-}
-
-function getMobileOperatingSystem() {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-    // Windows Phone must come first because its UA also contains "Android"
-    if (/windows phone/i.test(userAgent)) {
-        return "Windows Phone";
-    }
-
-    if (/android/i.test(userAgent)) {
-        return "Android";
-    }
-
-    // iOS detection from: http://stackoverflow.com/a/9039885/177710
-    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return "iOS";
-    }
-
-    return "unknown";
 }
 
 var drawer = function () {
