@@ -69,6 +69,11 @@ var mainFunction = function(){
 
         iframe.contentWindow.postMessage(`url${window.location.href}`, "*");
         iframe.contentWindow.postMessage(`browser${JSON.stringify(result.parsedResult)}`, "*");
+    
+        const len = eventsMatrix.length;
+        const events = eventsMatrix[len - 1]
+        iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+    
     }
 
     window.addEventListener('message', function(event) {
@@ -89,7 +94,6 @@ var mainFunction = function(){
 
         const len = eventsMatrix.length;
         const events = eventsMatrix[len - 1]
-        console.log(JSON.stringify({events}))
         iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
     }
     
