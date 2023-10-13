@@ -43,17 +43,20 @@ var loadJS = function(url, implementationCode, location){
 
 var mainFunction = function(){
 
-    rrwebRecord({
-        emit(event, isCheckout) {
-          // isCheckout is a flag to tell you the events has been checkout
-          if (isCheckout) {
-            eventsMatrix.push([]);
-          }
-          const lastEvents = eventsMatrix[eventsMatrix.length - 1];
-          lastEvents.push(event);
-        },
-        checkoutEveryNms: 30 * 1000, // checkout every 30 seconds
-    });
+    if ("MutationObserver" in window) {
+        rrwebRecord({
+            emit(event, isCheckout) {
+              // isCheckout is a flag to tell you the events has been checkout
+              if (isCheckout) {
+                eventsMatrix.push([]);
+              }
+              const lastEvents = eventsMatrix[eventsMatrix.length - 1];
+              lastEvents.push(event);
+            },
+            checkoutEveryNms: 30 * 1000, // checkout every 30 seconds
+        });
+    }
+    
 
     // Create the button element
     const userHelpButton = document.createElement("button");
@@ -105,7 +108,9 @@ var mainFunction = function(){
     
         const len = eventsMatrix.length;
         const events = eventsMatrix[len - 1]
-        iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+        if(events.length > 0) {
+            iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+        }
     
     }
 
@@ -127,7 +132,9 @@ var mainFunction = function(){
 
         const len = eventsMatrix.length;
         const events = eventsMatrix[len - 1]
-        iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+        if(events.length > 0) {
+            iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+        }
     }
     
 
