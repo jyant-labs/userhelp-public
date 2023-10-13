@@ -238,14 +238,6 @@ var mainFunction = function(){
     }
 }
 
-window.onload = function() {
-    loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
-        loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
-            loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
-        }, document.head);
-    }, document.head)
-}
-
 function initialLoad() {
     var isFirefox = typeof InstallTrigger !== 'undefined';
     var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
@@ -438,20 +430,48 @@ var drawer = function () {
 
 };
 
+window.onload = function() {
+    loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
+        loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
+            loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
+        }, document.head);
+    }, document.head)
+}
+
+
+const generateUUID = () => {
+    let
+      d = new Date().getTime(),
+      d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      let r = Math.random() * 16;
+      if (d > 0) {
+        r = (d + r) % 16 | 0;
+        d = Math.floor(d / 16);
+      } else {
+        r = (d2 + r) % 16 | 0;
+        d2 = Math.floor(d2 / 16);
+      }
+      return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+    });
+};
+
 drawer();
 
 document.write(`
 <section class="drawer" id="drawer-name" data-drawer-target>
-<div class="drawer__overlay" data-drawer-close tabindex="-1"></div>
-<div class="drawer__wrapper">
-    <div class="drawer__header">
-    <div style="font-family: sans-serif;font-weight: bold;">
-        ${UserHelpButtonText}
+    <div class="drawer__overlay" data-drawer-close tabindex="-1"></div>
+    <div class="drawer__wrapper">
+        <div class="drawer__header">
+        <div style="font-family: sans-serif;font-weight: bold;">
+            ${UserHelpButtonText}
+        </div>
+        <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
+        </div>
+        <div class="drawer__content">
+        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://app.userhelp.co/template/${UserHelpPublicProjectID}/${generateUUID()}"></iframe>
+
+        </div>
     </div>
-    <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
-    </div>
-    <div class="drawer__content">
-    <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://app.userhelp.co/template/${UserHelpPublicProjectID}/${crypto.randomUUID()}"></iframe>
-    </div>
-</div>
 </section>`)
+
