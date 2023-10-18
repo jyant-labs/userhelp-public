@@ -197,8 +197,6 @@ var mainFunction = function(){
                     proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
                     height: window.innerHeight,
                     y:document.documentElement.scrollTop || document.body.scrollTop,
-                    allowTaint:true,
-                    useCORS:true
                 }).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png');
 
