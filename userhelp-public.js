@@ -194,11 +194,11 @@ var mainFunction = function(){
                 });
             } else {
                 html2canvas(document.body, {
+                    proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app",
                     height: window.innerHeight,
                     y:document.documentElement.scrollTop || document.body.scrollTop,
                     allowTaint:true,
-                    useCORS:true,
-                    foreignObjectRendering: true
+                    useCORS:true
                 }).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png');
 
