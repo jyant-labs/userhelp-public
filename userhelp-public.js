@@ -201,6 +201,7 @@ var mainFunction = function(){
                     const screenshotDataUrl = canvas.toDataURL('image/png');
 
                     const img = document.createElement("img")
+                    img.setAttribute('crossorigin', 'anonymous')
                     img.src = screenshotDataUrl
                     document.body.appendChild(img)
                     const markerArea = new markerjs2.MarkerArea(img);
