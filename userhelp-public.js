@@ -196,7 +196,9 @@ var mainFunction = function(){
                 html2canvas(document.body, {
                     height: window.innerHeight,
                     y:document.documentElement.scrollTop || document.body.scrollTop,
-                    allowTaint:true
+                    allowTaint:true,
+                    useCORS:true,
+                    foreignObjectRendering: true
                 }).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png');
 
