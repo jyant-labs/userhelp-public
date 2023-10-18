@@ -143,58 +143,58 @@ var mainFunction = function(){
         setTimeout(function(){
             var isFirefox = typeof InstallTrigger !== 'undefined';
             var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
-            if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
-                navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
-                .then((stream) => {
-                    const videoTrack = stream.getVideoTracks()[0];
-                    const imageCapture = new ImageCapture(videoTrack);
+            // if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
+            //     navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
+            //     .then((stream) => {
+            //         const videoTrack = stream.getVideoTracks()[0];
+            //         const imageCapture = new ImageCapture(videoTrack);
 
-                    imageCapture.grabFrame()
-                    .then(async(imageBitmap) => {
+            //         imageCapture.grabFrame()
+            //         .then(async(imageBitmap) => {
 
-                        const canvas = document.createElement('canvas');
-                        canvas.width = imageBitmap.width;
-                        canvas.height = imageBitmap.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(imageBitmap, 0, 0);
-                        const screenshotDataUrl = canvas.toDataURL('image/png');
+            //             const canvas = document.createElement('canvas');
+            //             canvas.width = imageBitmap.width;
+            //             canvas.height = imageBitmap.height;
+            //             const ctx = canvas.getContext('2d');
+            //             ctx.drawImage(imageBitmap, 0, 0);
+            //             const screenshotDataUrl = canvas.toDataURL('image/png');
 
 
-                        const img = document.createElement("img")
-                        img.src = screenshotDataUrl
-                        document.body.appendChild(img)
-                        const markerArea = new markerjs2.MarkerArea(img);
-                        markerArea.uiStyleSettings.canvasBackgroundColor = "#1F2125"
-                        markerArea.settings.displayMode = 'popup';
-                        markerArea.addEventListener("render", (event) =>
-                        {
-                            img.src = event.dataUrl
-                            const iframe = document.getElementById("UserHelpIframe");
-                            iframe.contentWindow.postMessage(event.dataUrl, "*");
-                        });
-                        markerArea.show();
+            //             const img = document.createElement("img")
+            //             img.src = screenshotDataUrl
+            //             document.body.appendChild(img)
+            //             const markerArea = new markerjs2.MarkerArea(img);
+            //             markerArea.uiStyleSettings.canvasBackgroundColor = "#1F2125"
+            //             markerArea.settings.displayMode = 'popup';
+            //             markerArea.addEventListener("render", (event) =>
+            //             {
+            //                 img.src = event.dataUrl
+            //                 const iframe = document.getElementById("UserHelpIframe");
+            //                 iframe.contentWindow.postMessage(event.dataUrl, "*");
+            //             });
+            //             markerArea.show();
 
-                        markerArea.addEventListener("close", (event) =>
-                        {
-                            document.body.removeChild(img)
-                            document.getElementById("userHelpButton").click();
-                        });
+            //             markerArea.addEventListener("close", (event) =>
+            //             {
+            //                 document.body.removeChild(img)
+            //                 document.getElementById("userHelpButton").click();
+            //             });
 
-                        // Do something with the screenshotDataUrl, such as displaying it in an image element or sending it to a server.
-                    })
-                    .catch((error) => {
-                        console.error('Error capturing screenshot:', error);
-                    })
-                    .finally(() => {
-                        videoTrack.stop();
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error accessing screen:', error);
-                });
-            } else {
+            //             // Do something with the screenshotDataUrl, such as displaying it in an image element or sending it to a server.
+            //         })
+            //         .catch((error) => {
+            //             console.error('Error capturing screenshot:', error);
+            //         })
+            //         .finally(() => {
+            //             videoTrack.stop();
+            //         });
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error accessing screen:', error);
+            //     });
+            // } else {
                 html2canvas(document.body, {
-                    proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/",
+                    proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
                     height: window.innerHeight,
                     y:document.documentElement.scrollTop || document.body.scrollTop,
                     allowTaint:true,
@@ -223,7 +223,7 @@ var mainFunction = function(){
                         document.getElementById("userHelpButton").click();
                     });
                 });
-            }
+            // }
             
         }, 350);
     }
@@ -245,7 +245,8 @@ function initialLoad() {
     var isFirefox = typeof InstallTrigger !== 'undefined';
     var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
     if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
-        mainFunction()
+        // mainFunction()
+        loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
     } else {
         loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
     }
