@@ -141,7 +141,7 @@ var mainFunction = function(){
     async function captureScreenshot() {
         document.getElementsByClassName("drawer__overlay")[0].click();
         setTimeout(function(){
-            var isFirefox = typeof InstallTrigger !== 'undefined';
+            var isFirefox = navigator.userAgent.indexOf("Firefox") != -1 ? (true):(false)
             var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
             if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
                 navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
