@@ -115,7 +115,7 @@
 .drawer__content {
   position: relative;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   height: 100%;
   flex-grow: 1;
 }
