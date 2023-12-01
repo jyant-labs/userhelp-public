@@ -464,7 +464,7 @@ document.write(`
     <div class="drawer__overlay" data-drawer-close tabindex="-1"></div>
     <div class="drawer__wrapper">
         <div class="drawer__header">
-        <div style="font-family: sans-serif;font-weight: bold;">
+        <div style="font-family: sans-serif;font-weight: bold;color: black;font-size:24px">
             ${UserHelpButtonText}
         </div>
         <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
