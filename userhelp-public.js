@@ -43,6 +43,27 @@ var loadJS = function(url, implementationCode, location){
 
 var mainFunction = function(){
 
+    var drawerSection = document.createElement("section")
+    drawerSection.id = "drawer-name"
+    drawerSection.className = "drawer"
+    drawerSection.setAttribute("data-drawer-target",true)
+    drawerSection.innerHTML = `<div class="drawer__overlay" data-drawer-close tabindex="-1"></div>
+    <div class="drawer__wrapper">
+        <div class="drawer__header">
+        <div style="font-family: sans-serif;font-weight: bold;font-size: 18px;color:black">
+            ${UserHelpButtonText}
+        </div>
+        <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
+        </div>
+        <div class="drawer__content">
+        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://app.userhelp.co/template/${UserHelpPublicProjectID}/${generateUUID()}"></iframe>
+
+        </div>
+    </div>`
+    document.body.appendChild(drawerSection)
+
+    drawer();
+
     if ("MutationObserver" in window) {
         rrwebRecord({
             emit(event, isCheckout) {
@@ -450,8 +471,6 @@ window.onload = function() {
             loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
         }, document.head);
     }, document.head)
-
-    drawer();
 }
 
 
@@ -471,22 +490,3 @@ const generateUUID = () => {
       return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
     });
 };
-
-
-document.write(`
-<section class="drawer" id="drawer-name" data-drawer-target>
-    <div class="drawer__overlay" data-drawer-close tabindex="-1"></div>
-    <div class="drawer__wrapper">
-        <div class="drawer__header">
-        <div style="font-family: sans-serif;font-weight: bold;font-size: 18px;color:black">
-            ${UserHelpButtonText}
-        </div>
-        <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
-        </div>
-        <div class="drawer__content">
-        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://app.userhelp.co/template/${UserHelpPublicProjectID}/${generateUUID()}"></iframe>
-
-        </div>
-    </div>
-</section>`)
-
