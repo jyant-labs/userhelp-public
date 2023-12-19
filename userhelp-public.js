@@ -73,7 +73,7 @@ var mainFunction = function(){
     userHelpButton.style.alignItems = "center"
 
     if(UserHelpPlacementMode == "hidden") {
-        userHelpButton.style.display = "none"
+        userHelpButton.style.visibility = "hidden"
     }
 
     if(UserHelpPlacementMode == "automatic") {
