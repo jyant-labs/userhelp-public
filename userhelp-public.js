@@ -1,5 +1,5 @@
 var link = document.createElement( "link" );
-link.href = "https://cdn.jsdelivr.net/gh/jyant-labs/userhelp-public/userhelp-public.min.css";
+link.href = "https://cdn.jsdelivr.net/gh/jyant-labs/userhelp-public@main/userhelp-public.min.css";
 link.type = "text/css";
 link.rel = "stylesheet";
 
@@ -64,10 +64,17 @@ var mainFunction = function(){
 
     // Set the button text
     userHelpButton.textContent = UserHelpButtonText;
+    
 
     // Set any additional styles if needed
     userHelpButton.style.backgroundColor = UserHelpButtonColor
     userHelpButton.style.color = UserHelpTextColor
+    userHelpButton.style.display = "flex"
+    userHelpButton.style.alignItems = "center"
+
+    if(UserHelpPlacementMode == "hidden") {
+        userHelpButton.style.display = "none"
+    }
 
     if(UserHelpPlacementMode == "automatic") {
         switch (UserHelpAutomaticPosition) {
@@ -96,6 +103,7 @@ var mainFunction = function(){
     userHelpButton.setAttribute("data-drawer-trigger","true")
     userHelpButton.setAttribute("aria-controls","drawer-name")
     userHelpButton.setAttribute("aria-expanded","false")
+    
 
     // Function to be executed when the button is clicked
     function handleClick() {
@@ -233,7 +241,10 @@ var mainFunction = function(){
     userHelpButton.addEventListener("click", handleClick);
 
     // Append the button to the body of the website
-    const placement = document.getElementById("UserHelpManualContainerID")
+    var placement = null;
+    if(UserHelpManualContainerID && UserHelpPlacementMode == "manual") {
+        placement = document.getElementById(UserHelpManualContainerID)
+    }
     if(placement) {
         placement.appendChild(userHelpButton)
     } else {
@@ -478,4 +489,3 @@ document.write(`
         </div>
     </div>
 </section>`)
-
