@@ -73,7 +73,7 @@ var mainFunction = function(){
     userHelpButton.style.alignItems = "center"
 
     if(UserHelpPlacementMode == "hidden") {
-        userHelpButton.style.visibility = "hidden"
+        userHelpButton.style.display = "none"
     }
 
     if(UserHelpPlacementMode == "automatic") {
@@ -242,7 +242,7 @@ var mainFunction = function(){
 
     // Append the button to the body of the website
     var placement = null;
-    if(UserHelpManualContainerID && UserHelpPlacementMode == "manual") {
+    if(typeof UserHelpManualContainerID !== 'undefined' && UserHelpPlacementMode == "manual") {
         placement = document.getElementById(UserHelpManualContainerID)
     }
     if(placement) {
@@ -489,3 +489,4 @@ document.write(`
         </div>
     </div>
 </section>`)
+
