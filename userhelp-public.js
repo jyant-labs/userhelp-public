@@ -74,7 +74,7 @@ var mainFunction = function(){
               const lastEvents = eventsMatrix[eventsMatrix.length - 1];
               lastEvents.push(event);
             },
-            checkoutEveryNms: 30 * 1000, // checkout every 30 seconds
+            checkoutEveryNms: 60 * 1000, // checkout every 60 seconds
         });
     }
     
@@ -131,21 +131,23 @@ var mainFunction = function(){
         var result = bowser.getParser(window.navigator.userAgent);
 
         const iframe = document.getElementById("UserHelpIframe");
-
         iframe.contentWindow.postMessage(`url${window.location.href}`, "*");
         iframe.contentWindow.postMessage(`browser${JSON.stringify(result.parsedResult)}`, "*");
-    
-        const len = eventsMatrix.length;
-        const events = eventsMatrix[len - 1]
-        if(events.length > 0) {
-            iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
-        }
     
     }
 
     window.addEventListener('message', function(event) {
         if(event.data == "captureScreenshot") {
             captureScreenshot()
+        }
+
+        if(event.data == "getLatestRecording") {
+            const iframe = document.getElementById("UserHelpIframe");
+            const len = eventsMatrix.length;
+            const events = eventsMatrix[len - 1]
+            if(events.length > 0) {
+                iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+            }
         }
     });
 
@@ -158,12 +160,6 @@ var mainFunction = function(){
             columnNo:columnNo,
             error:error
         })}`, "*");
-
-        const len = eventsMatrix.length;
-        const events = eventsMatrix[len - 1]
-        if(events.length > 0) {
-            iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
-        }
     }
     
 
