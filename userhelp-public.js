@@ -132,7 +132,10 @@ var mainFunction = function(){
 
         const iframe = document.getElementById("UserHelpIframe");
         iframe.contentWindow.postMessage(`url${window.location.href}`, "*");
-        iframe.contentWindow.postMessage(`browser${JSON.stringify(result.parsedResult)}`, "*");
+        iframe.contentWindow.postMessage(`browser${JSON.stringify({...result.parsedResult, size:{
+            width:window.innerWidth,
+            height:window.innerHeight
+        }})}`, "*");
     
     }
 
@@ -142,11 +145,15 @@ var mainFunction = function(){
         }
 
         if(event.data == "getLatestRecording") {
-            const iframe = document.getElementById("UserHelpIframe");
-            const len = eventsMatrix.length;
-            const events = eventsMatrix[len - 1]
-            if(events.length > 0) {
-                iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+            try {
+                const iframe = document.getElementById("UserHelpIframe");
+                const len = eventsMatrix.length;
+                const events = len > 1 ? eventsMatrix[len - 2].concat(eventsMatrix[len - 1]):eventsMatrix[len - 1]
+                if(events.length > 0) {
+                    iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+                }
+            } catch (error) {
+                
             }
         }
     });
