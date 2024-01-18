@@ -1,11 +1,4 @@
-var link = document.createElement( "link" );
-link.href = "https://cdn.jsdelivr.net/gh/jyant-labs/userhelp-public@main/userhelp-public.min.css";
-link.type = "text/css";
-link.rel = "stylesheet";
-
 var eventsMatrix = [[]];
-
-document.getElementsByTagName( "head" )[0].appendChild( link );
 
 function getMobileOperatingSystem() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -78,14 +71,12 @@ var mainFunction = function(){
         });
     }
     
-
     // Create the button element
     const userHelpButton = document.createElement("button");
     userHelpButton.id = "userHelpButton"
 
     // Set the button text
     userHelpButton.textContent = UserHelpButtonText;
-    
 
     // Set any additional styles if needed
     userHelpButton.style.backgroundColor = UserHelpButtonColor
@@ -124,12 +115,10 @@ var mainFunction = function(){
     userHelpButton.setAttribute("data-drawer-trigger","true")
     userHelpButton.setAttribute("aria-controls","drawer-name")
     userHelpButton.setAttribute("aria-expanded","false")
-    
 
     // Function to be executed when the button is clicked
     function handleClick() {
         var result = bowser.getParser(window.navigator.userAgent);
-
         const iframe = document.getElementById("UserHelpIframe");
         iframe.contentWindow.postMessage(`url${window.location.href}`, "*");
         iframe.contentWindow.postMessage(`browser${JSON.stringify({...result.parsedResult, size:{
@@ -153,10 +142,10 @@ var mainFunction = function(){
                     iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
                 }
             } catch (error) {
-                
+                console.log("Error getting recording", error)
             }
         }
-    });
+    })
 
     window.onerror = function (msg, url, lineNo, columnNo, error) {
         const iframe = document.getElementById("UserHelpIframe");
@@ -168,7 +157,6 @@ var mainFunction = function(){
             error:error
         })}`, "*");
     }
-    
 
     async function captureScreenshot() {
         document.getElementsByClassName("drawer__overlay")[0].click();
@@ -190,30 +178,7 @@ var mainFunction = function(){
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(imageBitmap, 0, 0);
                         const screenshotDataUrl = canvas.toDataURL('image/png');
-
-
-                        const img = document.createElement("img")
-                        img.src = screenshotDataUrl
-                        document.body.appendChild(img)
-                        const markerArea = new markerjs2.MarkerArea(img);
-                        markerArea.uiStyleSettings.canvasBackgroundColor = "#1F2125"
-                        markerArea.settings.displayMode = 'popup';
-                        markerArea.addEventListener("render", (event) =>
-                        {
-                            img.src = event.dataUrl
-                            const iframe = document.getElementById("UserHelpIframe");
-                            iframe.contentWindow.postMessage(event.dataUrl, "*");
-                        });
-                        markerArea.show();
-
-                        markerArea.addEventListener("close", (event) =>
-                        {
-                            img.src = event.dataUrl
-                            document.body.removeChild(img)
-                            document.getElementById("userHelpButton").click();
-                        });
-
-                        // Do something with the screenshotDataUrl, such as displaying it in an image element or sending it to a server.
+                        sendScreenshot(screenshotDataUrl)
                     })
                     .catch((error) => {
                         console.error('Error capturing screenshot:', error);
@@ -232,34 +197,11 @@ var mainFunction = function(){
                     y:document.documentElement.scrollTop || document.body.scrollTop,
                 }).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png');
-
-                    const img = document.createElement("img")
-                    img.setAttribute('crossorigin', 'anonymous')
-                    img.src = screenshotDataUrl
-
-                    document.body.appendChild(img)
-                    const markerArea = new markerjs2.MarkerArea(img);
-                    markerArea.uiStyleSettings.canvasBackgroundColor = "#1F2125"
-                    markerArea.settings.displayMode = 'popup';
-                    markerArea.addEventListener("render", (event) =>
-                    {
-                        img.src = event.dataUrl
-                        const iframe = document.getElementById("UserHelpIframe");
-                        iframe.contentWindow.postMessage(event.dataUrl, "*");
-                    });
-                    markerArea.show();
-
-                    markerArea.addEventListener("close", (event) =>
-                    {
-                        document.body.removeChild(img)
-                        document.getElementById("userHelpButton").click();
-                    });
+                    sendScreenshot(screenshotDataUrl)
                 });
             }
-            
         }, 350);
     }
-
 
     // Attach the event listener to the button
     userHelpButton.addEventListener("click", handleClick);
@@ -287,7 +229,6 @@ function initialLoad() {
 }
 
 var drawer = function () {
-
     /**
     * Element.closest() polyfill
     * https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
@@ -352,7 +293,6 @@ var drawer = function () {
         selectorTrigger: '[data-drawer-trigger]',
         selectorClose: '[data-drawer-close]',
     };
-
 
     //
     // Methods
@@ -458,24 +398,29 @@ var drawer = function () {
 
     };
 
-
     //
     // Inits & Event Listeners
     //
     document.addEventListener('click', clickHandler, false);
     document.addEventListener('keydown', keydownHandler, false);
 
-
 };
 
 window.onload = function() {
-    loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
-        loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
-            loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
-        }, document.head);
-    }, document.head)
-}
+    var link = document.createElement( "link" );
+    link.href = "https://cdn.jsdelivr.net/gh/jyant-labs/userhelp-public@main/userhelp-public.min.css";
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    document.getElementsByTagName( "head" )[0].appendChild( link );
 
+    link.onload = function() {
+        loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
+            loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
+                loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
+            }, document.head);
+        }, document.head) 
+    }       
+}
 
 const generateUUID = () => {
     let
@@ -493,3 +438,27 @@ const generateUUID = () => {
       return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
     });
 };
+
+function sendScreenshot(screenshotDataUrl) {
+    const img = document.createElement("img")
+    img.setAttribute('crossorigin', 'anonymous')
+    img.src = screenshotDataUrl
+
+    document.body.appendChild(img)
+    const markerArea = new markerjs2.MarkerArea(img);
+    markerArea.uiStyleSettings.canvasBackgroundColor = "#1F2125"
+    markerArea.settings.displayMode = 'popup';
+    markerArea.addEventListener("render", (event) =>
+    {
+        img.src = event.dataUrl
+        const iframe = document.getElementById("UserHelpIframe");
+        iframe.contentWindow.postMessage(event.dataUrl, "*");
+    });
+    markerArea.show();
+    markerArea.addEventListener("close", (event) =>
+    {
+        img.src = event.dataUrl
+        document.body.removeChild(img)
+        document.getElementById("userHelpButton").click();
+    });
+}
