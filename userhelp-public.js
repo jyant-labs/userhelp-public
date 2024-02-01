@@ -34,7 +34,63 @@ var loadJS = function(url, implementationCode, location){
     location.appendChild(scriptTag);
 };
 
-var mainFunction = function(){
+var mainFunction = async function(){
+    var UHButtonText;
+    var UHButtonColor;
+    var UHTextColor;
+    var UHPlacementMode;
+    var UHAutomaticPosition;
+    var UHManualContainerID;
+
+    if(typeof UserHelpButtonText !== 'undefined') {
+        UHButtonText = UserHelpButtonText;
+    }
+    if(typeof UserHelpButtonColor !== 'undefined') {
+        UHButtonColor = UserHelpButtonColor
+    }
+    if(typeof UserHelpTextColor !== 'undefined') {
+        UHTextColor = UserHelpTextColor
+    }
+    if(typeof UserHelpPlacementMode !== 'undefined') {
+        UHPlacementMode = UserHelpPlacementMode
+    }
+    if(typeof UserHelpAutomaticPosition !== 'undefined') {
+        UHAutomaticPosition = UserHelpAutomaticPosition
+    }
+    if(typeof UserHelpManualContainerID !== 'undefined') {
+        UHManualContainerID = UserHelpManualContainerID
+    }
+
+    await fetch("https://us-central1-userhelp-30d32.cloudfunctions.net/app/getButtonData", {
+        method: "POST",
+        body: JSON.stringify({UserHelpPublicProjectID: UserHelpPublicProjectID})
+    })
+    .then(async(res) => {
+        if(res.status == 500) {
+            return;
+        }
+        const buttonData = await res.json()
+        
+        if(typeof UHButtonText == 'undefined') {
+            UHButtonText = buttonData.UserHelpButtonText
+        }
+        if(typeof UHButtonColor == 'undefined') {
+            UHButtonColor = buttonData.UserHelpButtonColor
+        }
+        if(typeof UHTextColor == 'undefined') {
+            UHTextColor = buttonData.UserHelpTextColor
+        }
+        if(typeof UHPlacementMode == 'undefined') {
+            UHPlacementMode = buttonData.UserHelpPlacementMode
+        }
+        if(typeof UHAutomaticPosition == 'undefined') {
+            UHAutomaticPosition = buttonData.UserHelpAutomaticPosition
+        }
+        if(typeof UHManualContainerID == 'undefined') {
+            UHManualContainerID = buttonData.UserHelpManualContainerID
+        }
+    })
+
 
     var drawerSection = document.createElement("section")
     drawerSection.id = "drawer-name"
@@ -44,7 +100,7 @@ var mainFunction = function(){
     <div class="drawer__wrapper">
         <div class="drawer__header">
         <div style="font-family: sans-serif;font-weight: bold;font-size: 18px;color:black">
-            ${UserHelpButtonText}
+            ${UHButtonText}
         </div>
         <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
         </div>
@@ -74,22 +130,22 @@ var mainFunction = function(){
     // Create the button element
     const userHelpButton = document.createElement("button");
     userHelpButton.id = "userHelpButton"
-
+    
     // Set the button text
-    userHelpButton.textContent = UserHelpButtonText;
+    userHelpButton.textContent = UHButtonText;
 
     // Set any additional styles if needed
-    userHelpButton.style.backgroundColor = UserHelpButtonColor
-    userHelpButton.style.color = UserHelpTextColor
+    userHelpButton.style.backgroundColor = UHButtonColor
+    userHelpButton.style.color = UHTextColor
     userHelpButton.style.display = "flex"
     userHelpButton.style.alignItems = "center"
 
-    if(UserHelpPlacementMode == "hidden") {
+    if(UHPlacementMode == "hidden") {
         userHelpButton.style.display = "none"
     }
 
-    if(UserHelpPlacementMode == "automatic") {
-        switch (UserHelpAutomaticPosition) {
+    if(UHPlacementMode == "automatic") {
+        switch (UHAutomaticPosition) {
             case "bottomRight":
                 userHelpButton.classList.add("userHelpButtonBottomRight")
                 break;
@@ -208,8 +264,8 @@ var mainFunction = function(){
 
     // Append the button to the body of the website
     var placement = null;
-    if(typeof UserHelpManualContainerID !== 'undefined' && UserHelpPlacementMode == "manual") {
-        placement = document.getElementById(UserHelpManualContainerID)
+    if(typeof UHManualContainerID !== 'undefined' && UHPlacementMode == "manual") {
+        placement = document.getElementById(UHManualContainerID)
     }
     if(placement) {
         placement.appendChild(userHelpButton)
@@ -461,4 +517,20 @@ function sendScreenshot(screenshotDataUrl) {
         document.body.removeChild(img)
         document.getElementById("userHelpButton").click();
     });
+
+}
+
+
+
+async function postData(url = "", data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: data, // body data type must match "Content-Type" header
+    });
+    return response.json(); // parses JSON response into native JavaScript objects
 }
