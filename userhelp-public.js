@@ -181,7 +181,6 @@ var mainFunction = async function(){
             width:window.innerWidth,
             height:window.innerHeight
         }})}`, "*");
-    
     }
 
     window.addEventListener('message', function(event) {
@@ -272,6 +271,32 @@ var mainFunction = async function(){
     } else {
         document.body.appendChild(userHelpButton);
     }
+
+    window.UserHelpSetName = function(name) {
+        const iframe = document.getElementById("UserHelpIframe");
+        iframe.contentWindow.postMessage(`setName${JSON.stringify(name)}`, "*");
+    }
+    window.UserHelpSetEmail = function(email) {
+        const iframe = document.getElementById("UserHelpIframe");
+        iframe.contentWindow.postMessage(`setEmail${JSON.stringify(email)}`, "*");
+    }
+    window.clickUserHelpButton() = function() {
+        userHelpButton.click()
+    }
+
+    const { fetch: originalFetch } = window;
+    window.fetch = async (...args) => {
+        let [resource, options ] = args;
+        const iframe = document.getElementById("UserHelpIframe");
+        iframe.contentWindow.postMessage(`networkRequest${JSON.stringify({
+            resource:resource,
+            options:options,
+            timeStamp:Date.now()
+        })}`, "*");
+        const response = await originalFetch(resource, config);
+        return response;
+    };
+    
 }
 
 function initialLoad() {
@@ -519,7 +544,6 @@ function sendScreenshot(screenshotDataUrl) {
     });
 
 }
-
 
 
 async function postData(url = "", data = {}) {
