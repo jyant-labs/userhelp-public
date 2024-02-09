@@ -280,12 +280,9 @@ var mainFunction = async function(){
         const iframe = document.getElementById("UserHelpIframe");
         iframe.contentWindow.postMessage(`setEmail${JSON.stringify(email)}`, "*");
     }
-    window.clickUserHelpButton() = function() {
-        userHelpButton.click()
-    }
 
     const { fetch: originalFetch } = window;
-    window.fetch = async (...args) => {
+    window.fetch = async function(...args) {
         let [resource, options ] = args;
         const iframe = document.getElementById("UserHelpIframe");
         iframe.contentWindow.postMessage(`networkRequest${JSON.stringify({
@@ -296,7 +293,7 @@ var mainFunction = async function(){
         const response = await originalFetch(resource, config);
         return response;
     };
-    
+
 }
 
 function initialLoad() {
