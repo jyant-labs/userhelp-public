@@ -281,19 +281,6 @@ var mainFunction = async function(){
         iframe.contentWindow.postMessage(`setEmail${JSON.stringify(email)}`, "*");
     }
 
-    const { fetch: originalFetch } = window;
-    window.fetch = async function(...args) {
-        let [resource, options ] = args;
-        const iframe = document.getElementById("UserHelpIframe");
-        iframe.contentWindow.postMessage(`networkRequest${JSON.stringify({
-            resource:resource,
-            options:options,
-            timeStamp:Date.now()
-        })}`, "*");
-        const response = await originalFetch(resource, config);
-        return response;
-    };
-
 }
 
 function initialLoad() {
