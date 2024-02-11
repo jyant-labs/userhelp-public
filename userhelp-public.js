@@ -12,6 +12,10 @@ function getMobileOperatingSystem() {
         return "Android";
     }
 
+    if (/electron/i.test(userAgent)) {
+        return "Electron";
+    }
+
     // iOS detection from: http://stackoverflow.com/a/9039885/177710
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
         return "iOS";
@@ -218,7 +222,7 @@ var mainFunction = async function(){
         setTimeout(function(){
             var isFirefox = typeof InstallTrigger !== 'undefined';
             var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
-            if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
+            if(getMobileOperatingSystem() != "Windows Phone" && getMobileOperatingSystem() != "Electron" && getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
                 navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
                 .then((stream) => {
                     const videoTrack = stream.getVideoTracks()[0];
@@ -286,7 +290,7 @@ var mainFunction = async function(){
 function initialLoad() {
     var isFirefox = typeof InstallTrigger !== 'undefined';
     var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
-    if(getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
+    if(getMobileOperatingSystem() != "Windows Phone" && getMobileOperatingSystem() != "Electron" && getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
         mainFunction()
     } else {
         loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
