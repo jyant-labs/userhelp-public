@@ -285,6 +285,7 @@ var mainFunction = async function(){
         iframe.contentWindow.postMessage(`setEmail${JSON.stringify(email)}`, "*");
     }
 
+    window.isUserHelpReady = true;
 }
 
 function initialLoad() {
