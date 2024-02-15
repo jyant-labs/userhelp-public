@@ -16,7 +16,6 @@ function getMobileOperatingSystem() {
         return "Electron";
     }
 
-    // iOS detection from: http://stackoverflow.com/a/9039885/177710
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
         return "iOS";
     }
@@ -109,7 +108,7 @@ var mainFunction = async function(){
         <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
         </div>
         <div class="drawer__content">
-        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://app.userhelp.co/template/${UserHelpPublicProjectID}/${generateUUID()}"></iframe>
+        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://platform.userhelp.co/bugReport/${UserHelpPublicProjectID}/${generateUUID()}"></iframe>
 
         </div>
     </div>`
@@ -250,6 +249,7 @@ var mainFunction = async function(){
                     console.error('Error accessing screen:', error);
                 });
             } else {
+                createLoadingOverlay();
                 html2canvas(document.body, {
                     proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
                     height: window.innerHeight,
@@ -257,6 +257,7 @@ var mainFunction = async function(){
                 }).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png');
                     sendScreenshot(screenshotDataUrl)
+                    removeLoadingOverlay()
                 });
             }
         }, 350);
@@ -299,10 +300,6 @@ function initialLoad() {
 }
 
 var drawer = function () {
-    /**
-    * Element.closest() polyfill
-    * https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
-    */
     if (!Element.prototype.closest) {
         if (!Element.prototype.matches) {
         Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
@@ -546,4 +543,33 @@ async function postData(url = "", data = {}) {
       body: data, // body data type must match "Content-Type" header
     });
     return response.json(); // parses JSON response into native JavaScript objects
+}
+
+
+function createLoadingOverlay() {
+    // Create the overlay container
+    const overlayContainer = document.createElement('div');
+    overlayContainer.id = 'UH-loading-overlay';
+    overlayContainer.setAttribute("data-html2canvas-ignore",true)
+
+    // Create the overlay content with a spinner
+    const overlayContent = document.createElement('div');
+    overlayContent.classList.add('UH-overlay-content');
+    overlayContent.setAttribute("data-html2canvas-ignore",true)
+
+    const spinner = document.createElement('div');
+    spinner.classList.add('UH-spinner');
+    spinner.setAttribute("data-html2canvas-ignore",true)
+
+    overlayContent.appendChild(spinner);
+    overlayContainer.appendChild(overlayContent);
+    
+    document.body.appendChild(overlayContainer);
+}
+
+function removeLoadingOverlay() {
+    const overlay = document.getElementById('UH-loading-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
 }
