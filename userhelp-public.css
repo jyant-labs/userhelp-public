@@ -93,7 +93,7 @@
   height: 100%;
   width: 100%;
   max-width: 375px;
-  z-index: 9999;
+  z-index: 2147483647;
   overflow: auto;
   
   transition: transform 0.3s;
