@@ -196,41 +196,43 @@ var mainFunction = async function(){
     async function captureScreenshot() {
         document.getElementsByClassName("drawer__overlay")[0].click();
         setTimeout(function() {
-            navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
-            .then((stream) => {
-                const videoTrack = stream.getVideoTracks()[0];
-                const imageCapture = new ImageCapture(videoTrack);
-
-                imageCapture.grabFrame()
-                .then(async(imageBitmap) => {
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = imageBitmap.width;
-                    canvas.height = imageBitmap.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(imageBitmap, 0, 0);
-                    const screenshotDataUrl = canvas.toDataURL('image/png');
-                    sendScreenshot(screenshotDataUrl)
-                })
-                .catch((error) => {
-                    console.error('Error capturing screenshot:', error);
-                })
-                .finally(() => {
-                    videoTrack.stop();
-                });
+            createLoadingOverlay();
+            html2canvas(document.body, {
+                proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
+                height: window.innerHeight,
+                y:document.documentElement.scrollTop || document.body.scrollTop,
+            }).then(function(canvas) {
+                const screenshotDataUrl = canvas.toDataURL('image/png');
+                sendScreenshot(screenshotDataUrl)
+                removeLoadingOverlay()
             })
-            .catch((error) => {
-                createLoadingOverlay();
-                html2canvas(document.body, {
-                    proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
-                    height: window.innerHeight,
-                    y:document.documentElement.scrollTop || document.body.scrollTop,
-                }).then(function(canvas) {
-                    const screenshotDataUrl = canvas.toDataURL('image/png');
-                    sendScreenshot(screenshotDataUrl)
-                    removeLoadingOverlay()
-                })
-            });
+
+            // navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
+            // .then((stream) => {
+            //     const videoTrack = stream.getVideoTracks()[0];
+            //     const imageCapture = new ImageCapture(videoTrack);
+
+            //     imageCapture.grabFrame()
+            //     .then(async(imageBitmap) => {
+
+            //         const canvas = document.createElement('canvas');
+            //         canvas.width = imageBitmap.width;
+            //         canvas.height = imageBitmap.height;
+            //         const ctx = canvas.getContext('2d');
+            //         ctx.drawImage(imageBitmap, 0, 0);
+            //         const screenshotDataUrl = canvas.toDataURL('image/png');
+            //         sendScreenshot(screenshotDataUrl)
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error capturing screenshot:', error);
+            //     })
+            //     .finally(() => {
+            //         videoTrack.stop();
+            //     });
+            // })
+            // .catch((error) => {
+                
+            // });
         }, 350);
     }
 
