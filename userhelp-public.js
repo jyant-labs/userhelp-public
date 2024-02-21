@@ -233,7 +233,7 @@ var mainFunction = async function(){
             // .catch((error) => {
                 
             // });
-        }, 350);
+        }, 1000);
     }
 
     // Attach the event listener to the button
