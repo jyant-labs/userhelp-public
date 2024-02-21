@@ -1,28 +1,5 @@
 var eventsMatrix = [[]];
 
-function getMobileOperatingSystem() {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-    // Windows Phone must come first because its UA also contains "Android"
-    if (/windows phone/i.test(userAgent)) {
-        return "Windows Phone";
-    }
-
-    if (/android/i.test(userAgent)) {
-        return "Android";
-    }
-
-    if (/electron/i.test(userAgent)) {
-        return "Electron";
-    }
-
-    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return "iOS";
-    }
-
-    return "unknown";
-}
-
 var loadJS = function(url, implementationCode, location){
     //url is URL of external file, implementationCode is the code
     //to be called from the file, location is the location to 
@@ -218,37 +195,31 @@ var mainFunction = async function(){
 
     async function captureScreenshot() {
         document.getElementsByClassName("drawer__overlay")[0].click();
-        setTimeout(function(){
-            var isFirefox = typeof InstallTrigger !== 'undefined';
-            var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
-            if(getMobileOperatingSystem() != "Windows Phone" && getMobileOperatingSystem() != "Electron" && getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
-                navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
-                .then((stream) => {
-                    const videoTrack = stream.getVideoTracks()[0];
-                    const imageCapture = new ImageCapture(videoTrack);
+        setTimeout(function() {
+            navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
+            .then((stream) => {
+                const videoTrack = stream.getVideoTracks()[0];
+                const imageCapture = new ImageCapture(videoTrack);
 
-                    imageCapture.grabFrame()
-                    .then(async(imageBitmap) => {
+                imageCapture.grabFrame()
+                .then(async(imageBitmap) => {
 
-                        const canvas = document.createElement('canvas');
-                        canvas.width = imageBitmap.width;
-                        canvas.height = imageBitmap.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(imageBitmap, 0, 0);
-                        const screenshotDataUrl = canvas.toDataURL('image/png');
-                        sendScreenshot(screenshotDataUrl)
-                    })
-                    .catch((error) => {
-                        console.error('Error capturing screenshot:', error);
-                    })
-                    .finally(() => {
-                        videoTrack.stop();
-                    });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = imageBitmap.width;
+                    canvas.height = imageBitmap.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imageBitmap, 0, 0);
+                    const screenshotDataUrl = canvas.toDataURL('image/png');
+                    sendScreenshot(screenshotDataUrl)
                 })
                 .catch((error) => {
-                    console.error('Error accessing screen:', error);
+                    console.error('Error capturing screenshot:', error);
+                })
+                .finally(() => {
+                    videoTrack.stop();
                 });
-            } else {
+            })
+            .catch((error) => {
                 createLoadingOverlay();
                 html2canvas(document.body, {
                     proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
@@ -258,8 +229,8 @@ var mainFunction = async function(){
                     const screenshotDataUrl = canvas.toDataURL('image/png');
                     sendScreenshot(screenshotDataUrl)
                     removeLoadingOverlay()
-                });
-            }
+                })
+            });
         }, 350);
     }
 
@@ -285,18 +256,12 @@ var mainFunction = async function(){
         const iframe = document.getElementById("UserHelpIframe");
         iframe.contentWindow.postMessage(`setEmail${JSON.stringify(email)}`, "*");
     }
+    window.UserHelpSetUserID = function(userID) {
+        const iframe = document.getElementById("UserHelpIframe");
+        iframe.contentWindow.postMessage(`setUserID${JSON.stringify(userID)}`, "*");
+    }
 
     window.isUserHelpReady = true;
-}
-
-function initialLoad() {
-    var isFirefox = typeof InstallTrigger !== 'undefined';
-    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification))
-    if(getMobileOperatingSystem() != "Windows Phone" && getMobileOperatingSystem() != "Electron" && getMobileOperatingSystem() != "Android" && getMobileOperatingSystem() != "iOS" && isFirefox == false && isSafari == false) {
-        mainFunction()
-    } else {
-        loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head);
-    }
 }
 
 var drawer = function () {
@@ -483,7 +448,9 @@ window.onload = function() {
     link.onload = function() {
         loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
             loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
-                loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js",initialLoad,document.head)
+                loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js", function() {
+                    loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head)
+                },document.head)
             }, document.head);
         }, document.head) 
     }       
@@ -530,21 +497,6 @@ function sendScreenshot(screenshotDataUrl) {
     });
 
 }
-
-
-async function postData(url = "", data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      mode: "cors", // no-cors, *cors, same-origin
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data, // body data type must match "Content-Type" header
-    });
-    return response.json(); // parses JSON response into native JavaScript objects
-}
-
 
 function createLoadingOverlay() {
     // Create the overlay container
