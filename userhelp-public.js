@@ -238,6 +238,7 @@ var mainFunction = async function(){
                 html2canvas(document.body, {
                     proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
                     y:document.documentElement.scrollTop || document.body.scrollTop,
+                    height:window.innerHeight,
                     logging:false,
                 }).then(function(canvas) {
                     const screenshotDataUrl = canvas.toDataURL('image/png')
