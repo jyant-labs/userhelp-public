@@ -237,10 +237,10 @@ var mainFunction = async function(){
                 createLoadingOverlay();
                 html2canvas(document.body, {
                     proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
-                    height: window.innerHeight,
                     y:document.documentElement.scrollTop || document.body.scrollTop,
+                    logging:false,
                 }).then(function(canvas) {
-                    const screenshotDataUrl = canvas.toDataURL('image/png');
+                    const screenshotDataUrl = canvas.toDataURL('image/png')
                     sendScreenshot(screenshotDataUrl)
                     removeLoadingOverlay()
                 })
@@ -492,23 +492,23 @@ function sendScreenshot(screenshotDataUrl) {
     img.setAttribute('crossorigin', 'anonymous')
     img.src = screenshotDataUrl
 
-    document.body.appendChild(img)
-    const markerArea = new markerjs2.MarkerArea(img);
-    markerArea.uiStyleSettings.canvasBackgroundColor = "#1F2125"
-    markerArea.settings.displayMode = 'popup';
-    markerArea.addEventListener("render", (event) =>
-    {
-        img.src = event.dataUrl
-        const iframe = document.getElementById("UserHelpIframe");
-        iframe.contentWindow.postMessage(event.dataUrl, "*");
-    });
-    markerArea.show();
-    markerArea.addEventListener("close", (event) =>
-    {
-        img.src = event.dataUrl
-        document.body.removeChild(img)
-        document.getElementById("userHelpButton").click();
-    });
+    img.onload = function() {
+        document.body.appendChild(img)
+        const markerArea = new markerjs2.MarkerArea(img);
+        markerArea.uiStyleSettings.canvasBackgroundColor = "#1F2125"
+        markerArea.settings.displayMode = 'popup';
+        markerArea.addEventListener("render", (event) =>
+        {
+            const iframe = document.getElementById("UserHelpIframe");
+            iframe.contentWindow.postMessage(event.dataUrl, "*");
+        });
+        markerArea.show();
+        markerArea.addEventListener("close", (event) =>
+        {
+            document.body.removeChild(img)
+            document.getElementById("userHelpButton").click();
+        });
+    }
 
 }
 
