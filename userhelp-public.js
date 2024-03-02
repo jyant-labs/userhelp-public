@@ -263,20 +263,89 @@ var mainFunction = async function(){
         document.body.appendChild(userHelpButton);
     }
 
-    window.UserHelpSetName = function(name) {
-        const iframe = document.getElementById("UserHelpIframe");
-        iframe.contentWindow.postMessage(`setName${JSON.stringify(name)}`, "*");
-    }
-    window.UserHelpSetEmail = function(email) {
-        const iframe = document.getElementById("UserHelpIframe");
-        iframe.contentWindow.postMessage(`setEmail${JSON.stringify(email)}`, "*");
-    }
-    window.UserHelpSetUserID = function(userID) {
-        const iframe = document.getElementById("UserHelpIframe");
-        iframe.contentWindow.postMessage(`setUserID${JSON.stringify(userID)}`, "*");
+    const iframe = document.getElementById("UserHelpIframe");
+    iframe.onload = function() {
+        window.UserHelpSetName = function(name) {
+            const iframe = document.getElementById("UserHelpIframe");
+            iframe.contentWindow.postMessage(`setName${JSON.stringify(name)}`, "*");
+        }
+        window.UserHelpSetEmail = function(email) {
+            const iframe = document.getElementById("UserHelpIframe");
+            iframe.contentWindow.postMessage(`setEmail${JSON.stringify(email)}`, "*");
+        }
+        window.UserHelpSetUserID = function(userID) {
+            const iframe = document.getElementById("UserHelpIframe");
+            iframe.contentWindow.postMessage(`setUserID${JSON.stringify(userID)}`, "*");
+        }
+    
+        window.openUserHelpButton = function() {
+            userHelpButton.click()
+        }
+        
+        const performance = window.performance;
+        new PerformanceObserver((list) => {
+            list.getEntries().forEach((entry) => {
+                const { name, initiatorType, duration, transferSize } = entry;
+        
+                const internalResources = ["markerjs2","userhelp","bowser","rrweb","html2canvas","web-vitals"]
+    
+                if(internalResources.some(resource => name.includes(resource))) {
+                    return;
+                }
+    
+                const resource = {
+                    name: name,
+                    initiatorType: initiatorType,
+                    duration: duration,
+                    transferSize: transferSize
+                }
+    
+                const iframe = document.getElementById("UserHelpIframe");
+                iframe.contentWindow.postMessage(`addResourcePerformance${JSON.stringify(resource)}`, "*");
+            });
+        }).observe({ type: 'resource', buffered:true })
+    
+    
+        new PerformanceObserver((list) => {
+            list.getEntries().forEach((navigationEntry) => {
+                const navigation = {
+                    domContentLoadedTime: navigationEntry.domContentLoadedEventEnd - navigationEntry.domContentLoadedEventStart,
+                    loadTime: navigationEntry.loadEventEnd - navigationEntry.loadEventStart,
+                    redirectCount: navigationEntry.redirectCount,
+                    redirectTime: navigationEntry.redirectEnd - navigationEntry.redirectStart
+                }
+                const iframe = document.getElementById("UserHelpIframe");
+                iframe.contentWindow.postMessage(`setNavigationPerformance${JSON.stringify(navigation)}`, "*");
+            });
+        }).observe({ type: 'navigation', buffered:true })
+    
+        performance.clearResourceTimings();
+    
+        var webVitalsDetails = {
+            CLS:null,
+            FID:null,
+            LCP:null
+        }
+        webVitals.onCLS(function(e) {
+            webVitalsDetails.CLS = e;
+            const iframe = document.getElementById("UserHelpIframe");
+            iframe.contentWindow.postMessage(`setWebVitals${JSON.stringify(webVitalsDetails)}`, "*");
+        });
+        webVitals.onFID(function(e) {
+            webVitalsDetails.FID = e;
+            const iframe = document.getElementById("UserHelpIframe");
+            iframe.contentWindow.postMessage(`setWebVitals${JSON.stringify(webVitalsDetails)}`, "*");
+        });
+        webVitals.onLCP(function(e) {
+            webVitalsDetails.LCP = e;
+            const iframe = document.getElementById("UserHelpIframe");
+            iframe.contentWindow.postMessage(`setWebVitals${JSON.stringify(webVitalsDetails)}`, "*");
+        });
     }
 
-    window.isUserHelpReady = true;
+    userHelpButton.onload = function() {
+        window.isUserHelpReady = true;
+    }
 }
 
 var drawer = function () {
@@ -464,7 +533,9 @@ window.onload = function() {
         loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
             loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
                 loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js", function() {
-                    loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', mainFunction, document.head)
+                    loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', function() {
+                        loadJS("https://unpkg.com/web-vitals", mainFunction, document.head)
+                    }, document.head)
                 },document.head)
             }, document.head);
         }, document.head)        
