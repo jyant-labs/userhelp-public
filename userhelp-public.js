@@ -343,9 +343,7 @@ var mainFunction = async function(){
         });
     }
 
-    userHelpButton.onload = function() {
-        window.isUserHelpReady = true;
-    }
+    window.isUserHelpReady = true;
 }
 
 var drawer = function () {
