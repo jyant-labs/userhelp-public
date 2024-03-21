@@ -21,6 +21,7 @@ var mainFunction = async function(){
     var UHPlacementMode;
     var UHAutomaticPosition;
     var UHManualContainerID;
+    var UHDarkMode;
 
     if(typeof UserHelpButtonText !== 'undefined') {
         UHButtonText = UserHelpButtonText;
@@ -39,6 +40,9 @@ var mainFunction = async function(){
     }
     if(typeof UserHelpManualContainerID !== 'undefined') {
         UHManualContainerID = UserHelpManualContainerID
+    }
+    if(typeof UserHelpDarkMode !== 'undefined') {
+        UHDarkMode = UserHelpDarkMode
     }
 
     await fetch("https://us-central1-userhelp-30d32.cloudfunctions.net/app/getButtonData", {
@@ -69,6 +73,9 @@ var mainFunction = async function(){
         if(typeof UHManualContainerID == 'undefined') {
             UHManualContainerID = buttonData.UserHelpManualContainerID
         }
+        if(typeof UHDarkMode == 'undefined') {
+            UHDarkMode = buttonData.UserHelpDarkMode
+        }
     })
 
 
@@ -78,14 +85,14 @@ var mainFunction = async function(){
     drawerSection.setAttribute("data-drawer-target",true)
     drawerSection.innerHTML = `<div class="drawer__overlay" data-drawer-close tabindex="-1"></div>
     <div class="drawer__wrapper">
-        <div class="drawer__header">
-        <div style="font-family: sans-serif;font-weight: bold;font-size: 18px;color:black">
+        <div class="${UHDarkMode ? "dark":""} drawer__header">
+        <div class="${UHDarkMode ? "dark":""} drawer__header__text">
             ${UHButtonText}
         </div>
-        <button class="drawer__close" data-drawer-close aria-label="Close Drawer"></button>
+        <button class="${UHDarkMode ? "dark":""} drawer__close" data-drawer-close aria-label="Close Drawer"></button>
         </div>
         <div class="drawer__content">
-        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://platform.userhelp.co/bugReport/${UserHelpPublicProjectID}/${generateUUID()}"></iframe>
+        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://platform.userhelp.co/bugReport/${UserHelpPublicProjectID}/${generateUUID()}${UHDarkMode ? "?dark=true":""}"></iframe>
 
         </div>
     </div>`
