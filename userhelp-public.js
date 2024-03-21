@@ -529,7 +529,7 @@ var drawer = function () {
 
 window.onload = function() {
     var link = document.createElement( "link" );
-    link.href = "https://cdn.jsdelivr.net/gh/jyant-labs/userhelp-public@main/userhelp-public.min.css";
+    link.href = "https://platform.userhelp.co/userhelp-public.min.css";
     link.type = "text/css";
     link.rel = "stylesheet";
     document.getElementsByTagName( "head" )[0].appendChild( link );
