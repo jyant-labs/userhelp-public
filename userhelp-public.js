@@ -22,6 +22,7 @@ var mainFunction = async function(){
     var UHAutomaticPosition;
     var UHManualContainerID;
     var UHDarkMode;
+    var UHLanguage;
 
     if(typeof UserHelpButtonText !== 'undefined') {
         UHButtonText = UserHelpButtonText;
@@ -43,6 +44,9 @@ var mainFunction = async function(){
     }
     if(typeof UserHelpDarkMode !== 'undefined') {
         UHDarkMode = UserHelpDarkMode
+    }
+    if(typeof UserHelpLanguage !== 'undefined') {
+        UHLanguage = UserHelpLanguage
     }
 
     await fetch("https://us-central1-userhelp-30d32.cloudfunctions.net/app/getButtonData", {
@@ -76,7 +80,19 @@ var mainFunction = async function(){
         if(typeof UHDarkMode == 'undefined') {
             UHDarkMode = buttonData.UserHelpDarkMode
         }
+        if(typeof UHLanguage == 'undefined') {
+            UHLanguage = buttonData.UserHelpLanguage
+        }
     })
+
+
+    var url = new URL(`https://platform.userhelp.co/bugReport/${UserHelpPublicProjectID}/${generateUUID()}`)
+    if(UHDarkMode) {
+        url.searchParams.append("dark",true)
+    }
+    if(UHLanguage) {
+        url.searchParams.append("language",UHLanguage)
+    }
 
 
     var drawerSection = document.createElement("section")
@@ -92,7 +108,7 @@ var mainFunction = async function(){
         <button class="${UHDarkMode ? "dark":""} drawer__close" data-drawer-close aria-label="Close Drawer"></button>
         </div>
         <div class="drawer__content">
-        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src="https://platform.userhelp.co/bugReport/${UserHelpPublicProjectID}/${generateUUID()}${UHDarkMode ? "?dark=true":""}"></iframe>
+        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src=${url.toString()}></iframe>
 
         </div>
     </div>`
