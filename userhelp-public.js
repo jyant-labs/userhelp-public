@@ -268,6 +268,9 @@ var mainFunction = async function(){
                     sendScreenshot(screenshotDataUrl)
                     removeLoadingOverlay()
                 })
+                .catch(err => {
+                    removeLoadingOverlay()
+                })
             }
         }, 500);
     }
