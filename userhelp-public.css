@@ -1,41 +1,83 @@
 #userHelpButton {
-  padding: 10px;
   font-weight: bold;
   font-size: 1em;
   cursor: pointer;
-  border-radius: 10px;
-  border:none
+  border:none;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 }
 
 .userHelpButtonBottomRight {
   position: fixed;
-  bottom:20px;
+  bottom:0px;
   right:20px;
   z-index: 199;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  padding: 10px;
+  transition: padding-bottom 0.3s ease;
 }
 
 .userHelpButtonBottomLeft {
   position: fixed;
-  bottom: 20px;
+  bottom: 0px;
   left:20px;
   z-index: 199;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  padding: 10px;
+  transition: padding-bottom 0.3s ease;
+}
 
+.userHelpButtonBottomRight:hover, .userHelpButtonBottomLeft:hover {
+  padding-bottom: 20px;
 }
 
 .userHelpButtonTopRight {
   position: fixed;
-  top: 20px;
+  top: 0px;
   right:20px;
   z-index: 199;
-
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding: 10px;
+  transition: padding-top 0.3s ease
 }
 
 .userHelpButtonTopLeft {
   position: fixed;
-  top: 20px;
+  top: 0px;
   left:20px;
   z-index: 199;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding: 10px;
+  transition: padding-top 0.3s ease;
+}
 
+.userHelpButtonTopRight:hover, .userHelpButtonTopLeft:hover {
+  padding-top: 20px;
+}
+
+.userHelpButtonMiddleRight {
+  position: fixed;
+  padding: 10px;
+  top: 50%;
+  right:0px;
+  transform: translateY(-50%) rotate(-90deg) translateY(150%);
+  z-index: 199;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+.userHelpButtonMiddleLeft {
+  position: fixed;
+  padding: 10px;
+  top: 50%;
+  left:0px;
+  transform: translateY(-50%) rotate(90deg) translateY(150%);
+  z-index: 199;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
 }
 
 .drawer {
@@ -64,11 +106,26 @@
 
 .drawer__header {
   /* Optional */
-  padding: 1.5rem;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ddd;
+  /* border-bottom: 1px solid #ddd; */
+}
+
+.dark.drawer__header {
+  background-color: #181818;
+}
+
+.drawer__header__text {
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+  color:black
+}
+
+.dark.drawer__header__text {
+  color:white
 }
 
 .drawer__close {
@@ -83,6 +140,10 @@
   height: 15px;
   flex-shrink: 0;
   margin-left: 1rem;
+}
+
+.dark.drawer__close {
+  filter: invert(100%) sepia(0%) saturate(7485%) hue-rotate(143deg) brightness(104%) contrast(104%);
 }
 
 .drawer__wrapper {
@@ -107,9 +168,6 @@
   transform: translate3d(103%, 0, 0); /* extra 3% because of box-shadow */ 
   
   -webkit-overflow-scrolling: touch; /* enables momentum scrolling in iOS overflow elements */
-
-  /* Optional */
-  box-shadow: 0 2px 6px #777;
 }
 
 .drawer__content {
