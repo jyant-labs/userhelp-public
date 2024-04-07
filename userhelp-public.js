@@ -164,7 +164,15 @@ var mainFunction = async function(){
             case "topLeft":
                 userHelpButton.classList.add("userHelpButtonTopLeft")
                 break;
-        
+
+            case "middleRight":
+                userHelpButton.classList.add("userHelpButtonMiddleRight")
+                break;
+
+            case "middleLeft":
+                userHelpButton.classList.add("userHelpButtonMiddleLeft")
+                break;
+            
             default:
                 userHelpButton.classList.add("userHelpButtonBottomRight")
                 break;
