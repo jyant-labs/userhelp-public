@@ -286,6 +286,30 @@ var mainFunction = async function(){
     // Attach the event listener to the button
     userHelpButton.addEventListener("click", handleClick);
 
+
+    //Listener for when button is appended
+    const MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+    const observer = new MutationObserver(function(mutations) {
+        if(document.contains(userHelpButton)) {
+            if(UHAutomaticPosition == "middleLeft") {
+                const width = userHelpButton.offsetWidth;
+                const height = userHelpButton.offsetHeight;
+                userHelpButton.style.transform = `rotate(90deg) translateX(calc(-1*(${(width*0.5)+height}px)))`
+                userHelpButton.style.visibility = "visible"
+            }
+            if(UHAutomaticPosition == "middleRight") {
+                const width = userHelpButton.offsetWidth;
+                const height = userHelpButton.offsetHeight;
+                userHelpButton.style.transform = `rotate(-90deg) translateX(calc(1*(${(width*0.5)+height}px)))`
+                userHelpButton.style.visibility = "visible"
+            }
+            window.isUserHelpReady = true;
+            observer.disconnect();
+        }
+    })
+    observer.observe(document, {attributes: false, childList: true, characterData: false, subtree:true});
+
+
     // Append the button to the body of the website
     var placement = null;
     if(typeof UHManualContainerID !== 'undefined' && UHPlacementMode == "manual") {
@@ -377,24 +401,6 @@ var mainFunction = async function(){
         });
     }
 
-    var interval = setInterval(function() {
-        if(document.getElementById("userHelpButton")) {
-            clearInterval(interval)
-            if(UHAutomaticPosition == "middleLeft") {
-                const width = userHelpButton.offsetWidth;
-                const height = userHelpButton.offsetHeight;
-                userHelpButton.style.transform = `rotate(90deg) translateX(calc(-1*(${(width*0.5)+height}px)))`
-                userHelpButton.style.visibility = "visible"
-            }
-            if(UHAutomaticPosition == "middleRight") {
-                const width = userHelpButton.offsetWidth;
-                const height = userHelpButton.offsetHeight;
-                userHelpButton.style.transform = `rotate(-90deg) translateX(calc(1*(${(width*0.5)+height}px)))`
-                userHelpButton.style.visibility = "visible"
-            }
-            window.isUserHelpReady = true;
-        }
-    }, 1000);
 }
 
 var drawer = function () {
