@@ -377,20 +377,24 @@ var mainFunction = async function(){
         });
     }
 
-    
-    userHelpButton.onload = function() {
-        if(UHAutomaticPosition == "middleLeft") {
-            const width = userHelpButton.offsetWidth;
-            const height = userHelpButton.offsetHeight;
-            userHelpButton.style.transform = `rotate(90deg) translateX(calc(-1*(${(width*0.5)+height}px)))`
+    var interval = setInterval(function() {
+        if(document.getElementById("userHelpButton")) {
+            clearInterval(interval)
+            if(UHAutomaticPosition == "middleLeft") {
+                const width = userHelpButton.offsetWidth;
+                const height = userHelpButton.offsetHeight;
+                userHelpButton.style.transform = `rotate(90deg) translateX(calc(-1*(${(width*0.5)+height}px)))`
+                userHelpButton.style.visibility = "visible"
+            }
+            if(UHAutomaticPosition == "middleRight") {
+                const width = userHelpButton.offsetWidth;
+                const height = userHelpButton.offsetHeight;
+                userHelpButton.style.transform = `rotate(-90deg) translateX(calc(1*(${(width*0.5)+height}px)))`
+                userHelpButton.style.visibility = "visible"
+            }
+            window.isUserHelpReady = true;
         }
-        if(UHAutomaticPosition == "middleRight") {
-            const width = userHelpButton.offsetWidth;
-            const height = userHelpButton.offsetHeight;
-            userHelpButton.style.transform = `rotate(-90deg) translateX(calc(1*(${(width*0.5)+height}px)))`
-        }
-        window.isUserHelpReady = true;
-    }
+    }, 1000);
 }
 
 var drawer = function () {
