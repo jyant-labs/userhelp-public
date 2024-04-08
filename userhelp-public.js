@@ -377,6 +377,17 @@ var mainFunction = async function(){
         });
     }
 
+    if(UHAutomaticPosition == "middleLeft") {
+        const width = userHelpButton.offsetWidth;
+        const height = userHelpButton.offsetHeight;
+        userHelpButton.style.transform = `rotate(90deg) translateX(calc(-1*(${(width*0.5)+height}px)))`
+    }
+    if(UHAutomaticPosition == "middleRight") {
+        const width = userHelpButton.offsetWidth;
+        const height = userHelpButton.offsetHeight;
+        userHelpButton.style.transform = `rotate(-90deg) translateX(calc(1*(${(width*0.5)+height}px)))`
+    }
+
     window.isUserHelpReady = true;
 }
 
