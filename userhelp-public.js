@@ -585,11 +585,11 @@ window.onload = function() {
     document.getElementsByTagName( "head" )[0].appendChild( link );
 
     link.onload = function() {
-        loadJS('https://unpkg.com/markerjs2/markerjs2.js', function() {
+        loadJS('https://cdn.jsdelivr.net/npm/markerjs2/markerjs2.min.js', function() {
             loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
                 loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js", function() {
                     loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', function() {
-                        loadJS("https://unpkg.com/web-vitals", mainFunction, document.head)
+                        loadJS("https://cdn.jsdelivr.net/npm/web-vitals@3.5.2/+esm", mainFunction, document.head)
                     }, document.head)
                 },document.head)
             }, document.head);
