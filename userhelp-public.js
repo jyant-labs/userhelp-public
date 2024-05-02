@@ -24,34 +24,34 @@ var mainFunction = async function(){
     var UHDarkMode;
     var UHLanguage;
 
-    if(typeof UserHelpButtonText !== 'undefined') {
-        UHButtonText = UserHelpButtonText;
+    if(typeof window.UserHelpButtonText !== 'undefined') {
+        UHButtonText = window.UserHelpButtonText;
     }
-    if(typeof UserHelpButtonColor !== 'undefined') {
-        UHButtonColor = UserHelpButtonColor
+    if(typeof window.UserHelpButtonColor !== 'undefined') {
+        UHButtonColor = window.UserHelpButtonColor
     }
-    if(typeof UserHelpTextColor !== 'undefined') {
-        UHTextColor = UserHelpTextColor
+    if(typeof window.UserHelpTextColor !== 'undefined') {
+        UHTextColor = window.UserHelpTextColor
     }
-    if(typeof UserHelpPlacementMode !== 'undefined') {
-        UHPlacementMode = UserHelpPlacementMode
+    if(typeof window.UserHelpPlacementMode !== 'undefined') {
+        UHPlacementMode = window.UserHelpPlacementMode
     }
-    if(typeof UserHelpAutomaticPosition !== 'undefined') {
-        UHAutomaticPosition = UserHelpAutomaticPosition
+    if(typeof window.UserHelpAutomaticPosition !== 'undefined') {
+        UHAutomaticPosition = window.UserHelpAutomaticPosition
     }
-    if(typeof UserHelpManualContainerID !== 'undefined') {
-        UHManualContainerID = UserHelpManualContainerID
+    if(typeof window.UserHelpManualContainerID !== 'undefined') {
+        UHManualContainerID = window.UserHelpManualContainerID
     }
-    if(typeof UserHelpDarkMode !== 'undefined') {
-        UHDarkMode = UserHelpDarkMode
+    if(typeof window.UserHelpDarkMode !== 'undefined') {
+        UHDarkMode = window.UserHelpDarkMode
     }
-    if(typeof UserHelpLanguage !== 'undefined') {
-        UHLanguage = UserHelpLanguage
+    if(typeof window.UserHelpLanguage !== 'undefined') {
+        UHLanguage = window.UserHelpLanguage
     }
 
     await fetch("https://us-central1-userhelp-30d32.cloudfunctions.net/app/getButtonData", {
         method: "POST",
-        body: JSON.stringify({UserHelpPublicProjectID: UserHelpPublicProjectID})
+        body: JSON.stringify({UserHelpPublicProjectID: window.UserHelpPublicProjectID})
     })
     .then(async(res) => {
         if(res.status == 500) {
@@ -86,7 +86,7 @@ var mainFunction = async function(){
     })
 
 
-    var url = new URL(`https://platform.userhelp.co/bugReport/${UserHelpPublicProjectID}/${generateUUID()}`)
+    var url = new URL(`https://platform.userhelp.co/bugReport/${window.UserHelpPublicProjectID}/${generateUUID()}`)
     if(UHDarkMode) {
         url.searchParams.append("dark",true)
     }
@@ -222,6 +222,7 @@ var mainFunction = async function(){
             columnNo:columnNo,
             error:error
         })}`, "*");
+        return false;
     }
 
     async function captureScreenshot() {
@@ -237,7 +238,7 @@ var mainFunction = async function(){
             }
             });
 
-            if(isValidBrowser) {
+            if(isValidBrowser && navigator.mediaDevices) {
                 navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, preferCurrentTab:true })
                 .then((stream) => {
                     const videoTrack = stream.getVideoTracks()[0];
