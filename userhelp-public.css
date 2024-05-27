@@ -60,24 +60,33 @@
 
 .userHelpButtonMiddleRight {
   position: fixed;
+  visibility: hidden;
   padding: 10px;
-  top: 50%;
   right:0px;
-  transform: translateY(-50%) rotate(-90deg) translateY(150%);
+  top: 50%;
+  transform-origin: bottom right;
   z-index: 199;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
+  transition: padding-bottom 0.3s ease, top 0.3s ease;
 }
 
 .userHelpButtonMiddleLeft {
   position: fixed;
+  visibility: hidden;
   padding: 10px;
-  top: 50%;
   left:0px;
-  transform: translateY(-50%) rotate(90deg) translateY(150%);
+  top: 50%;
+  transform-origin: bottom left;
   z-index: 199;
   border-top-right-radius: 10px;
   border-top-left-radius: 10px;
+  transition: padding-bottom 0.3s ease, top 0.3s ease;
+}
+
+.userHelpButtonMiddleRight:hover, .userHelpButtonMiddleLeft:hover {
+  padding-bottom: 20px;
+  top:calc(50% - 10px)
 }
 
 .drawer {
@@ -104,47 +113,6 @@
   user-select: none;      
 }
 
-.drawer__header {
-  /* Optional */
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  /* border-bottom: 1px solid #ddd; */
-}
-
-.dark.drawer__header {
-  background-color: #181818;
-}
-
-.drawer__header__text {
-  font-family: sans-serif;
-  font-weight: bold;
-  font-size: 18px;
-  color:black
-}
-
-.dark.drawer__header__text {
-  color:white
-}
-
-.drawer__close {
-  /* Optional */
-  margin: 0;
-  padding: 0;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%0A%3Csvg width='15px' height='16px' viewBox='0 0 15 16' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='2.-Menu' transform='translate(-15.000000, -13.000000)' stroke='%23000000'%3E%3Cg id='Group' transform='translate(15.000000, 13.521000)'%3E%3Cpath d='M0,0.479000129 L15,14.2971819' id='Path-3'%3E%3C/path%3E%3Cpath d='M0,14.7761821 L15,-1.24344979e-14' id='Path-3'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-  margin-left: 1rem;
-}
-
-.dark.drawer__close {
-  filter: invert(100%) sepia(0%) saturate(7485%) hue-rotate(143deg) brightness(104%) contrast(104%);
-}
 
 .drawer__wrapper {
   position: fixed;
