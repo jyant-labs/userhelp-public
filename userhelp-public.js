@@ -14,6 +14,174 @@ var loadJS = function(url, implementationCode, location){
     location.appendChild(scriptTag);
 };
 
+var drawer = function () {
+    if (!Element.prototype.closest) {
+        if (!Element.prototype.matches) {
+        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+        }
+        Element.prototype.closest = function (s) {
+        var el = this;
+        var ancestor = this;
+        if (!document.documentElement.contains(el)) return null;
+        do {
+            if (ancestor.matches(s)) return ancestor;
+            ancestor = ancestor.parentElement;
+        } while (ancestor !== null);
+        return null;
+        };
+    }
+
+    function trapFocus(element) {
+        var focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
+        var firstFocusableEl = focusableEls[0];  
+        var lastFocusableEl = focusableEls[focusableEls.length - 1];
+        var KEYCODE_TAB = 9;
+
+        element.addEventListener('keydown', function(e) {
+        var isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
+
+        if (!isTabPressed) { 
+            return; 
+        }
+
+        if ( e.shiftKey ) /* shift + tab */ {
+            if (document.activeElement === firstFocusableEl) {
+            lastFocusableEl.focus();
+                e.preventDefault();
+            }
+            } else /* tab */ {
+            if (document.activeElement === lastFocusableEl) {
+            firstFocusableEl.focus();
+                e.preventDefault();
+            }
+            }
+        });
+    }       
+
+    //
+    // Settings
+    //
+    var settings = {
+        speedOpen: 50,
+        speedClose: 350,
+        activeClass: 'is-active',
+        visibleClass: 'is-visible',
+        selectorTarget: '[data-drawer-target]',
+        selectorTrigger: '[data-drawer-trigger]',
+        selectorClose: '[data-drawer-close]',
+    };
+
+    //
+    // Methods
+    //
+
+    // Toggle accessibility
+    var toggleAccessibility = function (event) {
+        if (event.getAttribute('aria-expanded') === 'true') {
+        event.setAttribute('aria-expanded', false);
+        } else {
+        event.setAttribute('aria-expanded', true);
+        }   
+    };
+
+    // Open Drawer
+    var openDrawer = function (trigger) {
+
+        // Find target
+        var target = document.getElementById(trigger.getAttribute('aria-controls'));
+
+        // Make it active
+        target.classList.add(settings.activeClass);
+
+        // Make body overflow hidden so it's not scrollable
+        document.documentElement.style.overflow = 'hidden';
+
+        // Toggle accessibility
+        toggleAccessibility(trigger);
+
+        // Make it visible
+        setTimeout(function () {
+        target.classList.add(settings.visibleClass);
+        trapFocus(target);
+        }, settings.speedOpen); 
+
+    };
+
+    // Close Drawer
+    var closeDrawer = function (event) {
+
+        // Find target
+        var closestParent = event.closest(settings.selectorTarget),
+        childrenTrigger = document.querySelector('[aria-controls="' + closestParent.id + '"');
+
+        // Make it not visible
+        closestParent.classList.remove(settings.visibleClass);
+
+        // Remove body overflow hidden
+        document.documentElement.style.overflow = '';
+
+        // Toggle accessibility
+        toggleAccessibility(childrenTrigger);
+
+        // Make it not active
+        setTimeout(function () {
+        closestParent.classList.remove(settings.activeClass);
+        }, settings.speedClose);             
+
+    };
+
+    // Click Handler
+    var clickHandler = function (event) {
+
+        // Find elements
+        var toggle = event.target,
+        open = toggle.closest(settings.selectorTrigger),
+        close = toggle.closest(settings.selectorClose);
+
+        // Open drawer when the open button is clicked
+        if (open) {
+        openDrawer(open);
+        }
+
+        // Close drawer when the close button (or overlay area) is clicked
+        if (close) {
+        closeDrawer(close);
+        }
+
+        // Prevent default link behavior
+        if (open || close) {
+        event.preventDefault();
+        }
+
+    };
+
+    // Keydown Handler, handle Escape button
+    var keydownHandler = function (event) {
+
+        if (event.key === 'Escape' || event.keyCode === 27) {
+
+        // Find all possible drawers
+        var drawers = document.querySelectorAll(settings.selectorTarget),
+            i;
+
+        // Find active drawers and close them when escape is clicked
+        for (i = 0; i < drawers.length; ++i) {
+            if (drawers[i].classList.contains(settings.activeClass)) {
+            closeDrawer(drawers[i]);
+            }
+        }
+
+        }
+
+    };
+
+    //
+    // Inits & Event Listeners
+    //
+    document.addEventListener('click', clickHandler, false);
+    document.addEventListener('keydown', keydownHandler, false);
+};
+
 var mainFunction = async function(){
     var UHButtonText;
     var UHButtonColor;
@@ -85,14 +253,14 @@ var mainFunction = async function(){
         }
     })
 
-
-    var url = new URL(`https://platform.userhelp.co/bugReport/${window.UserHelpPublicProjectID}/${generateUUID()}`)
+    var url = new URL(`https://platform.userhelp.co/bugReport/${window.UserHelpPublicProjectID}`)
     if(UHDarkMode) {
         url.searchParams.append("dark",true)
     }
     if(UHLanguage) {
         url.searchParams.append("language",UHLanguage)
     }
+    url.searchParams.append("text",UHButtonText)
 
 
     var drawerSection = document.createElement("section")
@@ -101,15 +269,8 @@ var mainFunction = async function(){
     drawerSection.setAttribute("data-drawer-target",true)
     drawerSection.innerHTML = `<div class="drawer__overlay" data-drawer-close tabindex="-1"></div>
     <div class="drawer__wrapper">
-        <div class="${UHDarkMode ? "dark":""} drawer__header">
-        <div class="${UHDarkMode ? "dark":""} drawer__header__text">
-            ${UHButtonText}
-        </div>
-        <button class="${UHDarkMode ? "dark":""} drawer__close" data-drawer-close aria-label="Close Drawer"></button>
-        </div>
         <div class="drawer__content">
-        <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src=${url.toString()}></iframe>
-
+            <iframe id="UserHelpIframe" frameBorder="0" style="width:100%; height:100%" src=${url.toString()}></iframe>
         </div>
     </div>`
     document.body.appendChild(drawerSection)
@@ -195,6 +356,11 @@ var mainFunction = async function(){
     }
 
     window.addEventListener('message', function(event) {
+
+        if(event.data == "closeUHPopup") {
+            document.getElementsByClassName("drawer__overlay")[0].click();
+        }
+
         if(event.data == "captureScreenshot") {
             captureScreenshot()
         }
@@ -404,180 +570,6 @@ var mainFunction = async function(){
 
 }
 
-var drawer = function () {
-    if (!Element.prototype.closest) {
-        if (!Element.prototype.matches) {
-        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-        }
-        Element.prototype.closest = function (s) {
-        var el = this;
-        var ancestor = this;
-        if (!document.documentElement.contains(el)) return null;
-        do {
-            if (ancestor.matches(s)) return ancestor;
-            ancestor = ancestor.parentElement;
-        } while (ancestor !== null);
-        return null;
-        };
-    }
-
-
-    // Trap Focus 
-    // https://hiddedevries.nl/en/blog/2017-01-29-using-javascript-to-trap-focus-in-an-element
-    //
-    function trapFocus(element) {
-        var focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
-        var firstFocusableEl = focusableEls[0];  
-        var lastFocusableEl = focusableEls[focusableEls.length - 1];
-        var KEYCODE_TAB = 9;
-
-        element.addEventListener('keydown', function(e) {
-        var isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
-
-        if (!isTabPressed) { 
-            return; 
-        }
-
-        if ( e.shiftKey ) /* shift + tab */ {
-            if (document.activeElement === firstFocusableEl) {
-            lastFocusableEl.focus();
-                e.preventDefault();
-            }
-            } else /* tab */ {
-            if (document.activeElement === lastFocusableEl) {
-            firstFocusableEl.focus();
-                e.preventDefault();
-            }
-            }
-        });
-    }       
-
-
-    //
-    // Settings
-    //
-    var settings = {
-        speedOpen: 50,
-        speedClose: 350,
-        activeClass: 'is-active',
-        visibleClass: 'is-visible',
-        selectorTarget: '[data-drawer-target]',
-        selectorTrigger: '[data-drawer-trigger]',
-        selectorClose: '[data-drawer-close]',
-    };
-
-    //
-    // Methods
-    //
-
-    // Toggle accessibility
-    var toggleAccessibility = function (event) {
-        if (event.getAttribute('aria-expanded') === 'true') {
-        event.setAttribute('aria-expanded', false);
-        } else {
-        event.setAttribute('aria-expanded', true);
-        }   
-    };
-
-    // Open Drawer
-    var openDrawer = function (trigger) {
-
-        // Find target
-        var target = document.getElementById(trigger.getAttribute('aria-controls'));
-
-        // Make it active
-        target.classList.add(settings.activeClass);
-
-        // Make body overflow hidden so it's not scrollable
-        document.documentElement.style.overflow = 'hidden';
-
-        // Toggle accessibility
-        toggleAccessibility(trigger);
-
-        // Make it visible
-        setTimeout(function () {
-        target.classList.add(settings.visibleClass);
-        trapFocus(target);
-        }, settings.speedOpen); 
-
-    };
-
-    // Close Drawer
-    var closeDrawer = function (event) {
-
-        // Find target
-        var closestParent = event.closest(settings.selectorTarget),
-        childrenTrigger = document.querySelector('[aria-controls="' + closestParent.id + '"');
-
-        // Make it not visible
-        closestParent.classList.remove(settings.visibleClass);
-
-        // Remove body overflow hidden
-        document.documentElement.style.overflow = '';
-
-        // Toggle accessibility
-        toggleAccessibility(childrenTrigger);
-
-        // Make it not active
-        setTimeout(function () {
-        closestParent.classList.remove(settings.activeClass);
-        }, settings.speedClose);             
-
-    };
-
-    // Click Handler
-    var clickHandler = function (event) {
-
-        // Find elements
-        var toggle = event.target,
-        open = toggle.closest(settings.selectorTrigger),
-        close = toggle.closest(settings.selectorClose);
-
-        // Open drawer when the open button is clicked
-        if (open) {
-        openDrawer(open);
-        }
-
-        // Close drawer when the close button (or overlay area) is clicked
-        if (close) {
-        closeDrawer(close);
-        }
-
-        // Prevent default link behavior
-        if (open || close) {
-        event.preventDefault();
-        }
-
-    };
-
-    // Keydown Handler, handle Escape button
-    var keydownHandler = function (event) {
-
-        if (event.key === 'Escape' || event.keyCode === 27) {
-
-        // Find all possible drawers
-        var drawers = document.querySelectorAll(settings.selectorTarget),
-            i;
-
-        // Find active drawers and close them when escape is clicked
-        for (i = 0; i < drawers.length; ++i) {
-            if (drawers[i].classList.contains(settings.activeClass)) {
-            closeDrawer(drawers[i]);
-            }
-        }
-
-        }
-
-    };
-
-    //
-    // Inits & Event Listeners
-    //
-    document.addEventListener('click', clickHandler, false);
-    document.addEventListener('keydown', keydownHandler, false);
-
-};
-
 window.onload = function() {
     var link = document.createElement( "link" );
     link.href = "https://platform.userhelp.co/userhelp-public.min.css";
@@ -597,23 +589,6 @@ window.onload = function() {
         }, document.head)        
     }       
 }
-
-const generateUUID = () => {
-    let
-      d = new Date().getTime(),
-      d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      let r = Math.random() * 16;
-      if (d > 0) {
-        r = (d + r) % 16 | 0;
-        d = Math.floor(d / 16);
-      } else {
-        r = (d2 + r) % 16 | 0;
-        d2 = Math.floor(d2 / 16);
-      }
-      return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-    });
-};
 
 function sendScreenshot(screenshotDataUrl) {
     const img = document.createElement("img")
