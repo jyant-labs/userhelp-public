@@ -344,6 +344,7 @@ var mainFunction = async function(){
     userHelpButton.setAttribute("aria-controls","drawer-name")
     userHelpButton.setAttribute("aria-expanded","false")
 
+
     // Function to be executed when the button is clicked
     function handleClick() {
         var result = bowser.getParser(window.navigator.userAgent);
@@ -353,6 +354,14 @@ var mainFunction = async function(){
             width:window.innerWidth,
             height:window.innerHeight
         }})}`, "*");
+
+
+        fetch('https://get.geojs.io/v1/ip/geo.json')
+        .then(response => response.json())
+        .then(data => {
+            iframe.contentWindow.postMessage(`ip${JSON.stringify(data)}`, "*");
+        })
+
     }
 
     window.addEventListener('message', function(event) {
