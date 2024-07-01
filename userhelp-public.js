@@ -1,5 +1,3 @@
-var eventsMatrix = [[]];
-
 var loadJS = function(url, implementationCode, location){
     //url is URL of external file, implementationCode is the code
     //to be called from the file, location is the location to 
@@ -277,20 +275,6 @@ var mainFunction = async function(){
 
     drawer();
 
-    if ("MutationObserver" in window) {
-        rrwebRecord({
-            emit(event, isCheckout) {
-              // isCheckout is a flag to tell you the events has been checkout
-              if (isCheckout) {
-                eventsMatrix.push([]);
-              }
-              const lastEvents = eventsMatrix[eventsMatrix.length - 1];
-              lastEvents.push(event);
-            },
-            checkoutEveryNms: 60 * 1000, // checkout every 60 seconds
-        });
-    }
-    
     // Create the button element
     const userHelpButton = document.createElement("button");
     userHelpButton.id = "userHelpButton"
@@ -374,17 +358,8 @@ var mainFunction = async function(){
             captureScreenshot()
         }
 
-        if(event.data == "getLatestRecording") {
-            try {
-                const iframe = document.getElementById("UserHelpIframe");
-                const len = eventsMatrix.length;
-                const events = len > 1 ? eventsMatrix[len - 2].concat(eventsMatrix[len - 1]):eventsMatrix[len - 1]
-                if(events.length > 0) {
-                    iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
-                }
-            } catch (error) {
-                console.log("Error getting recording", error)
-            }
+        if(event.data == "captureRecording") {
+            captureRecording()
         }
     })
 
@@ -442,21 +417,67 @@ var mainFunction = async function(){
                 });
             } else {
                 createLoadingOverlay();
-                html2canvas(document.body, {
-                    proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
+                modernScreenshot.domToPng(document.body,{
+                    backgroundColor: document.body.style.backgroundColor || "white",
                     y:document.documentElement.scrollTop || document.body.scrollTop,
                     height:window.innerHeight,
-                    logging:false,
-                }).then(function(canvas) {
-                    const screenshotDataUrl = canvas.toDataURL('image/png')
-                    sendScreenshot(screenshotDataUrl)
-                    removeLoadingOverlay()
+                    filter: el => {
+                        if(el.nodeType === 1) {
+                            return !el.hasAttribute("data-html2canvas-ignore")
+                        } else {
+                            return true
+                        }
+                    },
+                    fetchFn: url => fetchFn(url)
                 })
-                .catch(err => {
+                .then(function (dataUrl) {
+                    base64URL = dataUrl;
+                    sendScreenshot(base64URL)
                     removeLoadingOverlay()
+                }).catch(err => {
+                    removeLoadingOverlay()
+                    console.log(err)
                 })
+
             }
         }, 500);
+    }
+
+
+    async function fetchFn(url) {
+        const imageUrl = url
+        const proxyUrl = `https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy?url=${encodeURIComponent(imageUrl)}`;
+    
+        const response = await fetch(proxyUrl);
+        if (!response.ok) {
+            return false;
+        }
+        const base64URL = await response.text();
+        return base64URL
+    }
+
+    let recordingButton = document.createElement("button")
+    recordingButton.textContent = "Stop recording"
+    recordingButton.className = "UH-recording-button"
+    document.body.appendChild(recordingButton)
+    let events = [];
+    async function captureRecording() {
+        document.getElementsByClassName("drawer__overlay")[0].click();
+        if ("MutationObserver" in window) {
+            let stopRecording = rrwebRecord({
+                emit(event) {
+                    events.push(event);
+                }
+            });
+            recordingButton.onclick = function() {
+                stopRecording()
+                const iframe = document.getElementById("UserHelpIframe");
+                iframe.contentWindow.postMessage(`recording${JSON.stringify({events})}`, "*");
+                recordingButton.style.display = 'none'
+                document.getElementById("userHelpButton").click();
+            }
+            recordingButton.style.display = 'block'
+        }
     }
 
     // Attach the event listener to the button
@@ -590,7 +611,7 @@ window.onload = function() {
         loadJS('https://cdn.jsdelivr.net/npm/markerjs2/markerjs2.min.js', function() {
             loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
                 loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js", function() {
-                    loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', function() {
+                    loadJS('https://cdn.jsdelivr.net/npm/modern-screenshot@4.4.39/dist/index.min.js', function() {
                         loadJS("https://cdn.jsdelivr.net/npm/web-vitals@3.5.2/dist/web-vitals.attribution.iife.min.js", mainFunction, document.head)
                     }, document.head)
                 },document.head)
