@@ -1,3 +1,5 @@
+var eventsMatrix = [[]];
+
 var loadJS = function(url, implementationCode, location){
     //url is URL of external file, implementationCode is the code
     //to be called from the file, location is the location to 
@@ -417,45 +419,24 @@ var mainFunction = async function(){
                 });
             } else {
                 createLoadingOverlay();
-                modernScreenshot.domToPng(document.body,{
-                    backgroundColor: document.body.style.backgroundColor || "white",
+                html2canvas(document.body, {
+                    proxy:"https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy",
                     y:document.documentElement.scrollTop || document.body.scrollTop,
                     height:window.innerHeight,
-                    filter: el => {
-                        if(el.nodeType === 1) {
-                            return !el.hasAttribute("data-html2canvas-ignore")
-                        } else {
-                            return true
-                        }
-                    },
-                    fetchFn: url => fetchFn(url)
+                    logging:false,
+                }).then(function(canvas) {
+                    const screenshotDataUrl = canvas.toDataURL('image/png')
+                    sendScreenshot(screenshotDataUrl)
+                    removeLoadingOverlay()
                 })
-                .then(function (dataUrl) {
-                    base64URL = dataUrl;
-                    sendScreenshot(base64URL)
+                .catch(err => {
                     removeLoadingOverlay()
-                }).catch(err => {
-                    removeLoadingOverlay()
-                    console.log(err)
                 })
 
             }
         }, 500);
     }
-
-
-    async function fetchFn(url) {
-        const imageUrl = url
-        const proxyUrl = `https://us-central1-userhelp-30d32.cloudfunctions.net/app/proxy?url=${encodeURIComponent(imageUrl)}`;
     
-        const response = await fetch(proxyUrl);
-        if (!response.ok) {
-            return false;
-        }
-        const base64URL = await response.text();
-        return base64URL
-    }
-
     let recordingButton = document.createElement("button")
     recordingButton.textContent = "Stop recording"
     recordingButton.className = "UH-recording-button"
@@ -611,7 +592,7 @@ window.onload = function() {
         loadJS('https://cdn.jsdelivr.net/npm/markerjs2/markerjs2.min.js', function() {
             loadJS('https://cdn.jsdelivr.net/npm/bowser@2.11.0/es5.min.js', function() {
                 loadJS("https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js", function() {
-                    loadJS('https://cdn.jsdelivr.net/npm/modern-screenshot@4.4.39/dist/index.min.js', function() {
+                    loadJS('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', function() {
                         loadJS("https://cdn.jsdelivr.net/npm/web-vitals@3.5.2/dist/web-vitals.attribution.iife.min.js", mainFunction, document.head)
                     }, document.head)
                 },document.head)
