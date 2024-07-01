@@ -193,6 +193,39 @@
   animation: UH-spin 1s linear infinite;
 }
 
+.UH-recording-button {
+  background-image: linear-gradient(#FF7878, #FF0000);
+  border: 0;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, .3) 0 5px 15px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  font-family: Montserrat,sans-serif;
+  font-size: .9em;
+  margin: 5px;
+  padding: 10px 15px;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  position: fixed;
+  display: none;
+  top: 10px;
+  right: 10px;
+  animation: UH-pulse-animation 2s infinite;
+}
+
+
+@keyframes UH-pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0px rgba(255, 0, 0, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 30px rgba(255, 0, 0, 0);
+  }
+}
+
 @keyframes UH-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
