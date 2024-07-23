@@ -523,7 +523,7 @@ var mainFunction = async function(){
             list.getEntries().forEach((entry) => {
                 const { name, initiatorType, duration, transferSize } = entry;
         
-                const internalResources = ["markerjs2","userhelp","bowser","rrweb","html2canvas","web-vitals"]
+                const internalResources = ["markerjs2","userhelp","bowser","rrweb","html2canvas","web-vitals","geojs"]
     
                 if(internalResources.some(resource => name.includes(resource))) {
                     return;
